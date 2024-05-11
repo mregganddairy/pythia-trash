@@ -1,0 +1,6 @@
+#for ignoring root files log files
+
+*.log
+*.root
+**/*.log
+**/*.root
