@@ -1,5 +1,5 @@
 //total eta distribution of muons and also distribution from different mothers 
-
+//(need to add a distribution for pt mom cross section without a eta cut)
 #include "TFile.h"
 #include "Pythia8/Pythia.h"
 #include "TH1.h"
@@ -13,7 +13,8 @@ using namespace Pythia8;
 
 TCanvas *c1 = new TCanvas(); //canvas for eta distribution
 TCanvas *c2 = new TCanvas(); // canvas for pseudorapidity pt distribution 
-TCanvas *c3 = new TCanvas(); // canvas for rapidity pt distribution  
+TCanvas *c3 = new TCanvas(); // canvas for pt distribution from different moms in forward region 
+TCanvas *c4 = new TCanvas(); // canvas for pt distribution from different moms inclusively (everywhere) 
 void assignment4macro(){
 	//pthat bins
 
@@ -22,13 +23,20 @@ static const int nbins =6;
 static const double binedges[nbins+1] = {0., 14., 30., 50., 75., 100., 150. };
 
 //creating lists of IDs of mother particles of interest
-static const int b_moms[] = {511, 521, 10511, 10521, 513, 523, 10513, 10523, 20513, 20523, 515, 525, 531, 533, 535, 541, 543,545, //mesons
-							5122, 5112, 5212, 5222, 5114, 5214, 5224, 5132, 5232, 5312, 5322, 5314, 5324, 5332, 5334}; //baryons
+static const int b_moms[] = {511, 521, 10511, 10521, 513, 523, 10513, 10523, 20513, 20523, 515, 525, 531, 533, 535, 541, 543,545, //charmed mesons
+							551, 553, 555, 557,	//bbbar
+							5122, 5112, 5212, 5222, 5114, 5214, 5224, 5132, 5232, 5312, 5322, 5314, 5324, 5332, 5334 //charmed baryons
+							};
 static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 20413, 20423, 415, 425, 431, 10431, 433, 10433, 20433, 435, //mesons
-							4122, 4222, 4212, 4112, 4224, 4214, 4114, 4232, 4132, 4322, 4312, 4324, 4314, 4332, 4334, 4422}; //mesons
+							441, 443, 445,	 //ccbar mesons
+							4122, 4222, 4212, 4112, 4224, 4214, 4114, 4232, 4132, 4322, 4312, 4324, 4314, 4332, 4334, 4422 //mesons
+							};
 	
 	//initialise histograms
 	
+	//total muon cross section with no cuts
+	TH1F* sub_TOTAL_muon_cross_section = new TH1F("sub_TOTAL_muon_cross_section", "", 50,0,100);
+	TH1F* TOTAL_muon_cross_section = new TH1F("TOTAL_muon_cross_section", "cross section from different mothers in forward region", 50,0,100);
 
 	//for eta distribution
 	TH1F* sub_muon_cross_section = new TH1F("sub_muon_cross_section","", 60, -15, 15);
@@ -49,7 +57,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	TH1F* total_muon_cross_section_fr = new TH1F("total_muon_cross_section_fr","", 100, 0, 100);
 
 
-	//muon cross section produced from bottom and charm
+	//muon cross section produced from bottom or charm
 	TH1F* sub_b_muon_cross_section = new TH1F("sub_b_muon_cross_section","", 50,  0, 100);
 	TH1F* b_muon_cross_section = new TH1F("b_muon_cross_section","", 50,  0, 100);
 	TH1F* sub_c_muon_cross_section = new TH1F("sub_c_muon_cross_section","", 50,  0, 100);
@@ -69,6 +77,10 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	{
 
 		//resetting sub bins (bins from pthat) to fill main histogram
+		sub_TOTAL_muon_cross_section->Reset();
+		sub_b_muon_cross_section->Reset();
+		sub_c_muon_cross_section->Reset();
+		sub_other_muon_cross_section->Reset();
 		sub_muon_cross_section->Reset();
 		sub_muon_cross_section_y->Reset();
 		sub_muon_cross_section_cb->Reset();
@@ -105,6 +117,8 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 		{
 			muontuples->GetEntry(event_counter);
 
+			if(eta>-4.0 && eta<-2.5){sub_TOTAL_muon_cross_section->Fill(pt);}
+
 			sub_muon_cross_section->Fill(eta);
 
 			sub_muon_cross_section_y->Fill(y);
@@ -119,25 +133,69 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 			{
 				sub_muon_cross_section_fr->Fill(pt);
 			}
+
+
+			//check if mother is b or c meson/baryon.
+			bool b_found = false;
+			bool c_found = false;
+
+			for (int i = 0; i < sizeof(b_moms)/sizeof(b_moms[0]); ++i)
+			{
+				if (abs(b_moms[i]) == abs(mother1))
+				{
+					b_found = true;
+					break;
+				}
+			}
+
+			for (int i = 0; i < sizeof(c_moms)/sizeof(c_moms[0]); ++i)
+			{
+				if (abs(c_moms[i]) == abs(mother1))
+				{
+					c_found = true;
+					break;
+				}
+			}
+			
+		//checking the mother of the muon and filling the appropriate histogram
+		if (b_found && eta>-4.0 && eta<-2.5){sub_b_muon_cross_section->Fill(pt);}
+
+		else if (c_found && eta>-4.0 && eta<-2.5){sub_c_muon_cross_section->Fill(pt);}
+
+		else if (eta>-4.0 && eta<-2.5)
+		{
+			sub_other_muon_cross_section->Fill(pt);
+			cout << " mom1 id: "<< mother1<< endl;
+		}
+
+
 		}
 		
 		//normalising bins for calculating the cross section
 		double_t scalebin = 1./(*binLuminosity)[ibin];
+
+		sub_TOTAL_muon_cross_section->Scale(scalebin, "width");
 		sub_muon_cross_section->Scale(scalebin, "width");
 		sub_muon_cross_section_y->Scale(scalebin, "width");
 		sub_muon_cross_section_cb->Scale(scalebin, "width");
 		sub_muon_cross_section_fr->Scale(scalebin, "width");
+		sub_b_muon_cross_section->Scale(scalebin, "width");
+		sub_c_muon_cross_section->Scale(scalebin, "width");
+		sub_other_muon_cross_section->Scale(scalebin, "width");
 
+		TOTAL_muon_cross_section->Add(sub_TOTAL_muon_cross_section);
 		total_muon_cross_section->Add(sub_muon_cross_section);
 		total_muon_cross_section_y->Add(sub_muon_cross_section_y);
 		total_muon_cross_section_cb->Add(sub_muon_cross_section_cb);
 		total_muon_cross_section_fr->Add(sub_muon_cross_section_fr);
+		b_muon_cross_section->Add(sub_b_muon_cross_section);
+		c_muon_cross_section->Add(sub_c_muon_cross_section);
+		other_muon_cross_section->Add(sub_other_muon_cross_section);
 	}	
 	TFile* outFile =new TFile("muonyieldmacro.root", "RECREATE");
 
 
 	c1->cd();
-//	total_muon_cross_section->SetMinimum(0.);
 
 	total_muon_cross_section->GetXaxis()->SetTitle("#eta");
 	total_muon_cross_section->GetYaxis()->SetTitle("d#sigma/d#eta (pb)");
@@ -155,6 +213,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 
 	c1->Write();
 
+	//checking contributions in different regions
 	c2->cd();
 //	total_muon_cross_section_cb->SetMinimum(0.);
 	total_muon_cross_section_fr->GetXaxis()->SetTitle("pt (GeV)");
@@ -170,8 +229,8 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 
 
 	TLegend *leg = new TLegend(0.6, 0.7, 0.9, 0.9);
-	leg->AddEntry(total_muon_cross_section_cb,"total_muon_cross_section_cb", "l");
-	leg->AddEntry(total_muon_cross_section_fr,"total_muon_cross_section_fr", "l");
+	leg->AddEntry(total_muon_cross_section_cb,"total_muon_cross_section_cb", "lep");
+	leg->AddEntry(total_muon_cross_section_fr,"total_muon_cross_section_fr", "lep");
 	leg->Draw("SAME");
 
 	c2->Write();
@@ -181,9 +240,27 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	//plotting muons from different sources
 	c3->cd();
 
+	TOTAL_muon_cross_section->GetYaxis()->SetTitle("d#sigma/dpt (pb/GeV/c)");
+	TOTAL_muon_cross_section->GetXaxis()->SetTitle("pt (GeV)");
 
+	TOTAL_muon_cross_section->Draw("SAME");
+	b_muon_cross_section->Draw("SAME");
+	c_muon_cross_section->Draw("SAME");
+	other_muon_cross_section->Draw("SAME");
 
+	TOTAL_muon_cross_section->SetLineColor(kBlack);
+	b_muon_cross_section->SetLineColor(kBlue);
+	c_muon_cross_section->SetLineColor(kRed);
+	other_muon_cross_section->SetLineColor(kGreen);
 
+	TLegend *leg2 = new TLegend(0.6, 0.7, 0.9, 0.9); //mesons
+	leg2->AddEntry(TOTAL_muon_cross_section,"Total", "lep");
+	leg2->AddEntry(b_muon_cross_section,"bottom hadron moms", "lep");
+	leg2->AddEntry(c_muon_cross_section,"charm hadron moms", "lep");
+	leg2->AddEntry(other_muon_cross_section,"other moms", "lep");
+	leg2->Draw("SAME");
+
+	c3->Write();
 
 
 	delete outFile;
