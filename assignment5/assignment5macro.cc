@@ -1,4 +1,5 @@
-//total eta distribution of muons and also distribution from different mothers 
+//Total eta distribution of muons and also distribution from different mothers.
+//Unlike in assignment4, this also includes W and Z production now.
 
 #include "TFile.h"
 #include "Pythia8/Pythia.h"
@@ -13,12 +14,12 @@ using namespace Pythia8;
 
 TCanvas *c2 = new TCanvas(); //canvas for pt distribution of muons from electroweak particles 
 TCanvas *c3 = new TCanvas(); //canvas for rapidity pt distribution  
-void assignment4macro(){
+void assignment5macro(){
 	//pthat bins
 
 //defining bins to seperate soft and hard qcd using pthat
-static const int nbins =6;
-static const double binedges[nbins+1] = {0., 14., 30., 50., 75., 100., 150. };
+static const int nbins =7;
+static const double binedges[nbins+1] = {0., 14.,20., 30., 50., 75., 100., 150. };
 
 //creating lists of IDs of mother particles of interest
 static const int b_moms[] = {511, 521, 10511, 10521, 513, 523, 10513, 10523, 20513, 20523, 515, 525, 531, 533, 535, 541, 543,545, //charmed mesons
@@ -81,6 +82,11 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 		sub_c_muon_cross_section->Reset();
 		sub_other_muon_cross_section->Reset();
 
+		sub_Z_muon_cross_section->Reset();
+		sub_W_muon_cross_section->Reset();
+
+		sub_Wp_muon_cross_section->Reset();
+		sub_Wm_muon_cross_section->Reset();
 
 		sub_muon_cross_section_cb->Reset();
 		sub_muon_cross_section_fr->Reset();
@@ -152,17 +158,28 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 				}
 			}
 			
-		//checking the mother of the muon and filling the appropriate histogram
-		if (b_found){sub_b_muon_cross_section->Fill(pt);}
+			//checking the mother of the muon and filling the appropriate histogram
+			if (b_found){sub_b_muon_cross_section->Fill(pt);}
 
-		else if (c_found){sub_c_muon_cross_section->Fill(pt);}
+			else if (c_found){sub_c_muon_cross_section->Fill(pt);}
 
-		else
-		{
+			else
+			{
 			sub_other_muon_cross_section->Fill(pt);
 			cout << " mom1 id: "<< mother1<< endl;
-		}
+			}
 
+
+			//checing if mother particle is a electroweak vector boson 
+
+			if (abs(mother1) == 24)
+			{
+				sub_W_muon_cross_section->Fill(pt);
+			}
+			else if(abs(mother1) == 23)
+			{
+				sub_Z_muon_cross_section->Fill(pt);
+			}
 
 		}
 		
@@ -175,6 +192,9 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 		sub_b_muon_cross_section->Scale(scalebin, "width");
 		sub_c_muon_cross_section->Scale(scalebin, "width");
 		sub_other_muon_cross_section->Scale(scalebin, "width");
+		sub_W_muon_cross_section->Scale(scalebin, "width");
+		sub_Z_muon_cross_section->Scale(scalebin, "width");
+		
 
 		TOTAL_muon_cross_section->Add(sub_TOTAL_muon_cross_section);
 		total_muon_cross_section_cb->Add(sub_muon_cross_section_cb);
@@ -182,6 +202,8 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 		b_muon_cross_section->Add(sub_b_muon_cross_section);
 		c_muon_cross_section->Add(sub_c_muon_cross_section);
 		other_muon_cross_section->Add(sub_other_muon_cross_section);
+		W_muon_cross_section->Add(sub_W_muon_cross_section);
+		Z_muon_cross_section->Add(sub_Z_muon_cross_section);
 	}	
 	TFile* outFile =new TFile("muonyieldmacro.root", "RECREATE");
 
@@ -220,17 +242,23 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	TOTAL_muon_cross_section->Draw("SAME");
 	b_muon_cross_section->Draw("SAME");
 	c_muon_cross_section->Draw("SAME");
+	Z_muon_cross_section->Draw("SAME");
+	W_muon_cross_section->Draw("SAME");
 	other_muon_cross_section->Draw("SAME");
 
 	TOTAL_muon_cross_section->SetLineColor(kBlack);
 	b_muon_cross_section->SetLineColor(kBlue);
 	c_muon_cross_section->SetLineColor(kRed);
+	W_muon_cross_section->SetLineColor(kMagenta);
+	Z_muon_cross_section->SetLineColor(kYellow);
 	other_muon_cross_section->SetLineColor(kGreen);
 
 	TLegend *leg2 = new TLegend(0.6, 0.7, 0.9, 0.9);
 	leg2->AddEntry(TOTAL_muon_cross_section,"Total", "lep");
 	leg2->AddEntry(b_muon_cross_section,"bottom hadron moms", "lep");
 	leg2->AddEntry(c_muon_cross_section,"charm hadron moms", "lep");
+	leg2->AddEntry(Z_muon_cross_section, "Z boson moms", "lep");
+	leg2->AddEntry(W_muon_cross_section, "W boson moms", "lep");
 	leg2->AddEntry(other_muon_cross_section,"other moms", "lep");
 	leg2->Draw("SAME");
 

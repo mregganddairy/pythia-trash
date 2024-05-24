@@ -31,8 +31,8 @@ int main()
 	pythia.readString("Beams:eCM = 13600.");
 	
 	//defining bins to seperate soft and hard qcd using pthat
-	static const int nbins =6;
-	static const double binedges[nbins+1] = {0., 14., 30., 50., 75., 100., 150. };
+	static const int nbins =7;
+	static const double binedges[nbins+1] = {0., 14., 20., 30., 50., 75., 100., 150. };
 
 	//tuple with relevant information on muons
 	vector<TNtuple*> muontuples(nbins);
@@ -42,8 +42,8 @@ int main()
 	vector<double> binLuminosity(nbins); //luminosity from generated process sigma to calculate cross sections
 	for (int i=0; i < nbins; ++i){
 		muontuples[i] = new TNtuple("mu_stuff", "mu_stuff", "binNo:eventNo:index:status:mother1:mother2:pAbs:pt:y:eta:id");
-		Wtuples[i] = new TNtuple("W_stuff", "W_stuff", "binNo:eventNo:index:status:mother1:mother2:pAbs:pt:y:eta:id");
-		Ztuples[i] = new TNtuple("Z_stuff", "Z_stuff", "binNo:eventNo:index:status:mother1:mother2:pAbs:pt:y:eta:id");
+		Wtuples[i] = new TNtuple("W_stuff", "W_stuff", "binNo:eventNo:index:status:mother1:mother2:daughter1:daughter2:pAbs:pt:y:eta:id");
+		Ztuples[i] = new TNtuple("Z_stuff", "Z_stuff", "binNo:eventNo:index:status:mother1:mother2:daughter1:daughter2:pAbs:pt:y:eta:id");
 	//muon number
 		}
 	
@@ -51,13 +51,25 @@ int main()
 
 	for (int ibin = 0; ibin < nbins; ++ibin)
 	{
-		if (ibin == 0){
+		if (ibin == 0)
+		{
 			pythia.readString("HardQCD:all = off");
 			pythia.readString("SoftQCD:nonDiffractive = on"); //find out why only non diffractive processes are used.
 
 			pythia.readString("WeakSingleBoson:all = on"); //switching on low energy EW boson production
 			pythia.readString("WeakBosonAndParton:all = off"); //switching off high energy EW boson production
 		}
+		
+		//switching off softqcd but leaving single boson production on.
+		else if (ibin == 1)
+		{
+			pythia.readString("HardQCD:all = on");
+			pythia.readString("SoftQCD:nonDiffractive = off"); //find out why only non diffractive processes are used.
+			pythia.readString("WeakSingleBoson:all = on"); //switching on low energy EW boson production
+			pythia.readString("WeakBosonAndParton:all = off"); //switching off high energy EW boson production
+		}
+
+		//switching on boson and parton production
 		else {
 			pythia.readString("HardQCD:all = on");
 			pythia.readString("SoftQCD:nonDiffractive = off");
@@ -123,6 +135,8 @@ int main()
 				{
 					double particlemother1 = pythia.event[pythia.event[i].mother1()].id();
 					double particlemother2 =pythia.event[pythia.event[i].mother2()].id();
+					double particledaughter1 =pythia.event[pythia.event[i].daughter1()].id();
+					double particledaughter2 =pythia.event[pythia.event[i].daughter2()].id();
 					double particlePAbs = pythia.event[i].pAbs();
 					double particleStatus = pythia.event[i].status();
 					double particlePt = pythia.event[i].pT();
@@ -133,13 +147,13 @@ int main()
 					//filling tuple bin entries
 					if (abs(pythia.event[i].id()) == 24) //for W
 					{ 
-					Wtuples[ibin]->Fill(ibin, iEvent,i, particleStatus, particlemother1, particlemother2, 
-							particlePAbs, particlePt, particleRapidity, particlePseudoRapidity, particleID);
+					Wtuples[ibin]->Fill(ibin, iEvent,i, particleStatus, particlemother1, particlemother2, particledaughter1,
+							particledaughter2, particlePAbs, particlePt, particleRapidity, particlePseudoRapidity, particleID);
 					}
 					if (abs(pythia.event[i].id()) == 23) //for Z
 					{
-					Ztuples[ibin]->Fill(ibin, iEvent,i, particleStatus, particlemother1, particlemother2, 
-							particlePAbs, particlePt, particleRapidity, particlePseudoRapidity, particleID);
+					Ztuples[ibin]->Fill(ibin, iEvent,i, particleStatus, particlemother1, particlemother2, particledaughter1,
+							particledaughter2, particlePAbs, particlePt, particleRapidity, particlePseudoRapidity, particleID);
 					}
 				}		
 			}
