@@ -1,5 +1,6 @@
 //total eta distribution of muons and also distribution from different mothers 
-//(see other macro for no cuts in rapidity)
+//only looking in low pt region
+
 #include "TFile.h"
 #include "Pythia8/Pythia.h"
 #include "TH1.h"
@@ -14,8 +15,7 @@ using namespace Pythia8;
 TCanvas *c1 = new TCanvas(); //canvas for eta distribution
 TCanvas *c2 = new TCanvas(); // canvas for pseudorapidity pt distribution 
 TCanvas *c3 = new TCanvas(); // canvas for pt distribution from different moms in forward region 
-TCanvas *c4 = new TCanvas(); // canvas for pt distribution from different moms inclusively (everywhere) 
-void assignment4macro(){
+void assignment4macro3(){
 	//pthat bins
 
 //defining bins to seperate soft and hard qcd using pthat
@@ -34,9 +34,9 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	
 	//initialise histograms
 	
-	//total muon cross section with cuts in the forward region
-	TH1F* sub_TOTAL_muon_cross_section = new TH1F("sub_TOTAL_muon_cross_section", "", 50,0,100);
-	TH1F* TOTAL_muon_cross_section = new TH1F("TOTAL_muon_cross_section", "cross section from different mothers in forward region", 50,0,100);
+	//total muon cross section with no cuts
+	TH1F* sub_TOTAL_muon_cross_section = new TH1F("sub_TOTAL_muon_cross_section", "", 50,0,20);
+	TH1F* TOTAL_muon_cross_section = new TH1F("TOTAL_muon_cross_section", "muon cross section from different mothers in 4#pi", 50,0,20);
 
 	//for eta distribution
 	TH1F* sub_muon_cross_section = new TH1F("sub_muon_cross_section","", 60, -15, 15);
@@ -48,8 +48,8 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	TH1F* total_muon_cross_section_y = new TH1F("total_muon_cross_section_y","rapidity distribution", 60, -15, 15);
 	
 	//for pt distribution in central barrel
-	TH1F* sub_muon_cross_section_cb = new TH1F("sub_muon_cross_section_cb","", 100, 0, 100);
-	TH1F* total_muon_cross_section_cb = new TH1F("total_muon_cross_section_cb","", 100, 0, 100);
+	TH1F* sub_muon_cross_section_cb = new TH1F("sub_muon_cross_section_cb","", 100, 0, 10);
+	TH1F* total_muon_cross_section_cb = new TH1F("total_muon_cross_section_cb","", 100, 0, 10);
 
 
 	//for pt distribution in forward region 
@@ -58,15 +58,15 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 
 
 	//muon cross section produced from bottom or charm
-	TH1F* sub_b_muon_cross_section = new TH1F("sub_b_muon_cross_section","", 50,  0, 100);
-	TH1F* b_muon_cross_section = new TH1F("b_muon_cross_section","", 50,  0, 10);
-	TH1F* sub_c_muon_cross_section = new TH1F("sub_c_muon_cross_section","", 50,  0, 100);
-	TH1F* c_muon_cross_section = new TH1F("c_muon_cross_section","", 50,  0, 10);
+	TH1F* sub_b_muon_cross_section = new TH1F("sub_b_muon_cross_section","", 50,  0, 20);
+	TH1F* b_muon_cross_section = new TH1F("b_muon_cross_section","", 50,  0, 20);
+	TH1F* sub_c_muon_cross_section = new TH1F("sub_c_muon_cross_section","", 50, 0, 20);
+	TH1F* c_muon_cross_section = new TH1F("c_muon_cross_section","", 50,  0, 20);
 
 
 	//muon cross sections which don't come from bottom or charm
-	TH1F* sub_other_muon_cross_section = new TH1F("sub_other_muon_cross_section","", 50,  0, 100);
-	TH1F* other_muon_cross_section = new TH1F("other_muon_cross_section","", 50,  0, 100);
+	TH1F* sub_other_muon_cross_section = new TH1F("sub_other_muon_cross_section","", 50,  0, 20);
+	TH1F* other_muon_cross_section = new TH1F("other_muon_cross_section","", 50,  0, 20);
 
 	TFile* infile = TFile::Open("muonyield.root", "READ");
 	
@@ -117,7 +117,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 		{
 			muontuples->GetEntry(event_counter);
 
-			if(eta>-4.0 && eta<-2.5){sub_TOTAL_muon_cross_section->Fill(pt);}
+			sub_TOTAL_muon_cross_section->Fill(pt);
 
 			sub_muon_cross_section->Fill(eta);
 
@@ -158,11 +158,11 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 			}
 			
 		//checking the mother of the muon and filling the appropriate histogram
-		if (b_found && eta>-4.0 && eta<-2.5){sub_b_muon_cross_section->Fill(pt);}
+		if (b_found){sub_b_muon_cross_section->Fill(pt);}
 
-		else if (c_found && eta>-4.0 && eta<-2.5){sub_c_muon_cross_section->Fill(pt);}
+		else if (c_found){sub_c_muon_cross_section->Fill(pt);}
 
-		else if (eta>-4.0 && eta<-2.5)
+		else  
 		{
 			sub_other_muon_cross_section->Fill(pt);
 			cout << " mom1 id: "<< mother1<< endl;
@@ -242,6 +242,8 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 
 	TOTAL_muon_cross_section->GetYaxis()->SetTitle("d#sigma/dpt (pb/GeV/c)");
 	TOTAL_muon_cross_section->GetXaxis()->SetTitle("pt (GeV)");
+
+	TOTAL_muon_cross_section->SetMarkerStyle(kFullCircle);
 
 	TOTAL_muon_cross_section->Draw("SAME");
 	b_muon_cross_section->Draw("SAME");

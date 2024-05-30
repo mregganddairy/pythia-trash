@@ -163,16 +163,9 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 
 			else if (c_found){sub_c_muon_cross_section->Fill(pt);}
 
-			else
-			{
-			sub_other_muon_cross_section->Fill(pt);
-			cout << " mom1 id: "<< mother1<< endl;
-			}
+			//checing if mother particle is a weak vector boson 
 
-
-			//checing if mother particle is a electroweak vector boson 
-
-			if (abs(mother1) == 24)
+			else if (abs(mother1) == 24)
 			{
 				sub_W_muon_cross_section->Fill(pt);
 			}
@@ -181,6 +174,11 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 				sub_Z_muon_cross_section->Fill(pt);
 			}
 
+			else
+			{
+			sub_other_muon_cross_section->Fill(pt);
+			cout << " mom1 id: "<< mother1<< endl;
+			}
 		}
 		
 		//normalising bins for calculating the cross section

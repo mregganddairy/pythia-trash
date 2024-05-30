@@ -19,6 +19,13 @@ int main()
 
 	//processes which will be on for all bins
 	pythia.readString("WeakDoubleBoson:all = on");
+	
+	//force Z and W to decay to muons to get better stats
+	pythia.readString("23:onMode = off");
+	pythia.readString("23:onIfAny = 13 -13"); 
+	
+	pythia.readString("24:onMode = off");
+	pythia.readString("24:onIfAny =  13 14"); 
 
 	//creating ROOT file for histograms
 	TFile* outFile = new TFile("muonyield.root", "RECREATE");
@@ -70,7 +77,8 @@ int main()
 		}
 
 		//switching on boson and parton production
-		else {
+		else 
+		{
 			pythia.readString("HardQCD:all = on");
 			pythia.readString("SoftQCD:nonDiffractive = off");
 
