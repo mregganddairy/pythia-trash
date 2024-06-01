@@ -1,4 +1,5 @@
 #include "Pythia8/Pythia.h"
+#include "Pythia8/PythiaParallel.h"
 #include <cmath>
 #include "TCanvas.h"
 #include "TLatex.h"
@@ -15,7 +16,7 @@ using namespace Pythia8;
 int main()
 {
 
-	Pythia pythia;
+	PythiaParallel pythia;
 
 	//creating ROOT file for histograms
 	TFile* outFile = new TFile("muonyield.root", "RECREATE");
@@ -26,6 +27,7 @@ int main()
 	TH1F* total_muon_yield = new TH1F("total_muon_yield","muon yield;pT;dN/pT", 150, 0, 150);
 
 	pythia.readString("Beams:eCM = 13600.");
+	pythia.readString("Parallelism:numThreads = 4");
 	
 	//defining bins to seperate soft and hard qcd using pthat
 	static const int nbins =6;
@@ -40,7 +42,7 @@ int main()
 	//muon number
 		}
 	
-	int nevents = 1000000;
+	int nevents = 2000000;
 
 	for (int ibin = 0; ibin < nbins; ++ibin)
 	{
@@ -58,39 +60,53 @@ int main()
 		pythia.settings.parm("PhaseSpace:pTHatMin", binedges[ibin]);
 		pythia.settings.parm("PhaseSpace:pTHatMax",binedges[ibin+1]);
 
-		pythia.init();
+		if (!pythia.init()) return 1;	//initiate pythia and output an error if it doesn't initiate.
+
 		
-		hard_muon_yield->Reset(); //restart hard process binning for new bin 
+
+		hard_muon_yield->Reset(); //restart hard process binning for new bin (this is only the hard muon yield in a particular bin, not all of them.) 
 
 		int event_count = 0; // to account for softqcd being dumb, we count the number of events in each bin seperately.
 							 
-		//begining event loop
-		for (int iEvent = 0; iEvent < nevents; ++iEvent)
+		//generating events using run with nevents number of events.
+		//this allows for the use of parallel generation of events
+		//and is analogous to pyhia.next and the event loop.
+		pythia.run(nevents, [&](Pythia* pythiaPtr)
 		{
-			if (!pythia.next()) continue;
 
-			double pThat = pythia.info.pTHat();
+		// giving reference to the instance that generated the event.
+		Event& event = pythiaPtr->event; 
+		const Info& info = pythiaPtr->info;					 
 
-			if (ibin == 0 && pythia.info.isNonDiffractive() && pThat > binedges[ibin+1]) continue;//apparently softqcd is stupid or something and doesn't have an upper limit on its pThat or something. So contribution above pThat max need to be manually removed.
+
+		//commented out stuff for single thread event generation.
+		//begining event loop
+		//for (int iEvent = 0; iEvent < nevents; ++iEvent)
+		//	if (!pythia.next()) continue;
+
+			double pThat = info.pTHat();
+
+			if (ibin == 0 && info.isNonDiffractive() && pThat > binedges[ibin+1]) return;//apparently softqcd is stupid or something and doesn't have an upper limit on its pThat or something. So contribution above pThat max need to be manually removed.
 
 			event_count++;
 
 			//begin particle loop
-			for (int i=0; i < pythia.event.size();++i)
+			for (int i=0; i < event.size();++i)
 			{
-				if (abs(pythia.event[i].id()) == 13 && pythia.event[i].isFinal())
+				if (abs(event[i].id()) == 13 && event[i].isFinal())
 				{
-					double particlemother1 = pythia.event[pythia.event[i].mother1()].id();
-					double particlemother2 =pythia.event[pythia.event[i].mother2()].id();
-					double particlePAbs = pythia.event[i].pAbs();
-					double particleStatus = pythia.event[i].status();
-					double particlePt = pythia.event[i].pT();
-					double particleRapidity = pythia.event[i].y();
-					double particlePseudoRapidity = pythia.event[i].eta();
-					double particleID = pythia.event[i].id();
+					double particlemother1 = event[event[i].mother1()].id();
+					double particlemother2 =event[event[i].mother2()].id();
+					double particlePAbs = event[i].pAbs();
+					double particleStatus = event[i].status();
+					double particlePt = event[i].pT();
+					double particleRapidity = event[i].y();
+					double particlePseudoRapidity = event[i].eta();
+					double particleID = event[i].id();
+					double eventNo = event_count;
 					
 					//filling tuple bin entries
-					muontuples[ibin]->Fill(ibin, iEvent,i, particleStatus, particlemother1, particlemother2, 
+					muontuples[ibin]->Fill(ibin, eventNo, i, particleStatus, particlemother1, particlemother2, 
 							particlePAbs, particlePt, particleRapidity, particlePseudoRapidity, particleID);
 					
 //////////////////////////////////////////////////////////////////////////////
@@ -108,10 +124,10 @@ int main()
 			}
 			
 
-		}
-		binLuminosity[ibin] = event_count/(pythia.info.sigmaGen()*pow(10,9));//integrated luminosity used for normalisation/calculation of the cross sections
+		});
+		binLuminosity[ibin] = event_count/(pythia.sigmaGen()*pow(10,9));//integrated luminosity used for normalisation/calculation of the cross sections
 
-		cout <<"bin number"<< ibin<<" cross section: " << pythia.info.sigmaGen()*pow(10,9)<<endl;
+		cout <<"bin number"<< ibin<<" cross section: " << pythia.sigmaGen()*pow(10,9)<<endl;
 		if (ibin ==0)
 		{
 			soft_muon_yield->Scale(1/binLuminosity[ibin] , "width");
