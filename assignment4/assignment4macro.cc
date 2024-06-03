@@ -14,7 +14,6 @@ using namespace Pythia8;
 TCanvas *c1 = new TCanvas(); //canvas for eta distribution
 TCanvas *c2 = new TCanvas(); // canvas for pseudorapidity pt distribution 
 TCanvas *c3 = new TCanvas(); // canvas for pt distribution from different moms in forward region 
-TCanvas *c4 = new TCanvas(); // canvas for pt distribution from different moms inclusively (everywhere) 
 void assignment4macro(){
 	//pthat bins
 
@@ -249,9 +248,9 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	other_muon_cross_section->Draw("SAME");
 
 	TOTAL_muon_cross_section->SetLineColor(kBlack);
-	b_muon_cross_section->SetLineColor(kBlue);
-	c_muon_cross_section->SetLineColor(kRed);
-	other_muon_cross_section->SetLineColor(kGreen);
+	b_muon_cross_section->SetLineColor(kRed);
+	c_muon_cross_section->SetLineColor(kGreen);
+	other_muon_cross_section->SetLineColor(kMagenta);
 
 	TLegend *leg2 = new TLegend(0.6, 0.7, 0.9, 0.9); //mesons
 	leg2->AddEntry(TOTAL_muon_cross_section,"Total", "lep");

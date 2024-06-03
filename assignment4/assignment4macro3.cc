@@ -251,9 +251,9 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	other_muon_cross_section->Draw("SAME");
 
 	TOTAL_muon_cross_section->SetLineColor(kBlack);
-	b_muon_cross_section->SetLineColor(kBlue);
-	c_muon_cross_section->SetLineColor(kRed);
-	other_muon_cross_section->SetLineColor(kGreen);
+	b_muon_cross_section->SetLineColor(kRed);
+	c_muon_cross_section->SetLineColor(kGreen);
+	other_muon_cross_section->SetLineColor(kMagenta);
 
 	TLegend *leg2 = new TLegend(0.6, 0.7, 0.9, 0.9); //mesons
 	leg2->AddEntry(TOTAL_muon_cross_section,"Total", "lep");
