@@ -1,5 +1,4 @@
 #include "Pythia8/Pythia.h"
-#include "Pythia8/PythiaParallel.h"
 #include <cmath>
 #include "TCanvas.h"
 #include "TLatex.h"
@@ -16,11 +15,10 @@ using namespace Pythia8;
 int main()
 {
 
-	PythiaParallel pythia;
+	Pythia pythia;
 
 	//processes which will be on for all bins
 	pythia.readString("WeakDoubleBoson:all = on");
-	pythia.readString("Parallelism:numThreads = 3");
 	
 	//force Z and W to decay to muons to get better stats
 	pythia.readString("23:onMode = off");
@@ -62,8 +60,8 @@ int main()
 	{
 		if (ibin == 0)
 		{
-		//	pythia.readString("HardQCD:all = off");
-		//	pythia.readString("SoftQCD:nonDiffractive = on"); //find out why only non diffractive processes are used.
+			pythia.readString("HardQCD:all = off");
+			pythia.readString("SoftQCD:nonDiffractive = on"); //find out why only non diffractive processes are used.
 
 			pythia.readString("WeakSingleBoson:all = on"); //switching on low energy EW boson production
 			pythia.readString("WeakBosonAndParton:all = off"); //switching off high energy EW boson production
@@ -72,8 +70,8 @@ int main()
 		//switching off softqcd but leaving single boson production on.
 		else if (ibin == 1)
 		{
-		//	pythia.readString("HardQCD:all = on");
-		//	pythia.readString("SoftQCD:nonDiffractive = off"); //find out why only non diffractive processes are used.
+			pythia.readString("HardQCD:all = on");
+			pythia.readString("SoftQCD:nonDiffractive = off"); //find out why only non diffractive processes are used.
 			pythia.readString("WeakSingleBoson:all = on"); //switching on low energy EW boson production
 			pythia.readString("WeakBosonAndParton:all = off"); //switching off high energy EW boson production
 		}
@@ -81,8 +79,8 @@ int main()
 		//switching on boson and parton production
 		else 
 		{
-		//	pythia.readString("HardQCD:all = on");
-		//	pythia.readString("SoftQCD:nonDiffractive = off");
+			pythia.readString("HardQCD:all = on");
+			pythia.readString("SoftQCD:nonDiffractive = off");
 
 			pythia.readString("WeakSingleBoson:all = off");
 			pythia.readString("WeakBosonAndParton:all = on"); //switching on high energy EW boson production
@@ -99,36 +97,33 @@ int main()
 
 		int event_count = 0; // to account for softqcd being dumb, we count the number of events in each bin seperately.
 							 
-
-		pythia.run(nevents, [&](Pythia* pythiaPtr)
+		//begining event loop
+		for (int iEvent = 0; iEvent < nevents; ++iEvent)
 		{
-			//giving reference to the instance that generated the event.
-			Event& event = pythiaPtr->event;
-			const Info& info = pythiaPtr->info;
+			if (!pythia.next()) continue;
 
-			double pThat = info.pTHat();
+			double pThat = pythia.info.pTHat();
 
-			if (ibin == 0 && info.isNonDiffractive() && pThat > binedges[ibin+1]) return;//apparently softqcd is stupid or something and doesn't have an upper limit on its pThat or something. So contribution above pThat max need to be manually removed.
+			if (ibin == 0 && pythia.info.isNonDiffractive() && pThat > binedges[ibin+1]) continue;//apparently softqcd is stupid or something and doesn't have an upper limit on its pThat or something. So contribution above pThat max need to be manually removed.
 
 			event_count++;
 
 			//begin particle loop
-			for (int i=0; i < event.size();++i)
+			for (int i=0; i < pythia.event.size();++i)
 			{
-				if (abs(event[i].id()) == 13 && event[i].isFinal())
+				if (abs(pythia.event[i].id()) == 13 && pythia.event[i].isFinal())
 				{
-					double particlemother1 = event[event[i].mother1()].id();
-					double particlemother2 =event[event[i].mother2()].id();
-					double particlePAbs = event[i].pAbs();
-					double particleStatus = event[i].status();
-					double particlePt = event[i].pT();
-					double particleRapidity = event[i].y();
-					double particlePseudoRapidity = event[i].eta();
-					double particleID = event[i].id();
-					double eventNo = event_count;
+					double particlemother1 = pythia.event[pythia.event[i].mother1()].id();
+					double particlemother2 =pythia.event[pythia.event[i].mother2()].id();
+					double particlePAbs = pythia.event[i].pAbs();
+					double particleStatus = pythia.event[i].status();
+					double particlePt = pythia.event[i].pT();
+					double particleRapidity = pythia.event[i].y();
+					double particlePseudoRapidity = pythia.event[i].eta();
+					double particleID = pythia.event[i].id();
 					
 					//filling tuple bin entries
-					muontuples[ibin]->Fill(ibin,eventNo,i, particleStatus, particlemother1, particlemother2, 
+					muontuples[ibin]->Fill(ibin, iEvent,i, particleStatus, particlemother1, particlemother2, 
 							particlePAbs, particlePt, particleRapidity, particlePseudoRapidity, particleID);
 					
 //////////////////////////////////////////////////////////////////////////////
@@ -144,39 +139,38 @@ int main()
 //////////////////////////////////////////////////////////////////////////////
 				}
 				//filling tuples of W and Z
-				if (abs(event[i].id()) == 24 || abs(event[i].id()) == 23) 
+				if (abs(pythia.event[i].id()) == 24 || abs(pythia.event[i].id()) == 23) 
 				{
-					double particlemother1 = event[event[i].mother1()].id();
-					double particlemother2 =event[event[i].mother2()].id();
-					double particledaughter1 =event[event[i].daughter1()].id();
-					double particledaughter2 =event[event[i].daughter2()].id();
-					double particlePAbs = event[i].pAbs();
-					double particleStatus = event[i].status();
-					double particlePt = event[i].pT();
-					double particleRapidity = event[i].y();
-					double particlePseudoRapidity = event[i].eta();
-					double particleID = event[i].id();
-					double eventNo = event_count;
+					double particlemother1 = pythia.event[pythia.event[i].mother1()].id();
+					double particlemother2 =pythia.event[pythia.event[i].mother2()].id();
+					double particledaughter1 =pythia.event[pythia.event[i].daughter1()].id();
+					double particledaughter2 =pythia.event[pythia.event[i].daughter2()].id();
+					double particlePAbs = pythia.event[i].pAbs();
+					double particleStatus = pythia.event[i].status();
+					double particlePt = pythia.event[i].pT();
+					double particleRapidity = pythia.event[i].y();
+					double particlePseudoRapidity = pythia.event[i].eta();
+					double particleID = pythia.event[i].id();
 					
 					//filling tuple bin entries
-					if (abs(event[i].id()) == 24) //for W
+					if (abs(pythia.event[i].id()) == 24) //for W
 					{ 
-					Wtuples[ibin]->Fill(ibin, eventNo,i, particleStatus, particlemother1, particlemother2, particledaughter1,
+					Wtuples[ibin]->Fill(ibin, iEvent,i, particleStatus, particlemother1, particlemother2, particledaughter1,
 							particledaughter2, particlePAbs, particlePt, particleRapidity, particlePseudoRapidity, particleID);
 					}
-					if (abs(event[i].id()) == 23) //for Z
+					if (abs(pythia.event[i].id()) == 23) //for Z
 					{
-					Ztuples[ibin]->Fill(ibin, eventNo,i, particleStatus, particlemother1, particlemother2, particledaughter1,
+					Ztuples[ibin]->Fill(ibin, iEvent,i, particleStatus, particlemother1, particlemother2, particledaughter1,
 							particledaughter2, particlePAbs, particlePt, particleRapidity, particlePseudoRapidity, particleID);
 					}
 				}		
 			}
 			
 
-		});
-		binLuminosity[ibin] = event_count/(pythia.sigmaGen()*pow(10,9));//integrated luminosity used for normalisation/calculation of the cross sections
+		}
+		binLuminosity[ibin] = event_count/(pythia.info.sigmaGen()*pow(10,9));//integrated luminosity used for normalisation/calculation of the cross sections
 
-		cout <<"bin number"<< ibin<<" cross section: " << pythia.sigmaGen()*pow(10,9)<<endl;
+		cout <<"bin number"<< ibin<<" cross section: " << pythia.info.sigmaGen()*pow(10,9)<<endl;
 		if (ibin ==0)
 		{
 			soft_muon_yield->Scale(1/binLuminosity[ibin] , "width");
