@@ -43,18 +43,14 @@ int main()
 
 	//tuple with relevant information on muons
 	vector<TNtuple*> muontuples(nbins);
-	vector<TNtuple*> Ztuples(nbins);
-	vector<TNtuple*> Wtuples(nbins);
 
 	vector<double> binLuminosity(nbins); //luminosity from generated process sigma to calculate cross sections
 	for (int i=0; i < nbins; ++i){
 		muontuples[i] = new TNtuple("mu_stuff", "mu_stuff", "binNo:eventNo:index:status:mother1:mother2:pAbs:pt:y:eta:id");
-		Wtuples[i] = new TNtuple("W_stuff", "W_stuff", "binNo:eventNo:index:status:mother1:mother2:daughter1:daughter2:pAbs:pt:y:eta:id");
-		Ztuples[i] = new TNtuple("Z_stuff", "Z_stuff", "binNo:eventNo:index:status:mother1:mother2:daughter1:daughter2:pAbs:pt:y:eta:id");
 	//muon number
 		}
 	
-	int nevents = 1000000;
+	int nevents = 1000;
 
 	for (int ibin = 0; ibin < nbins; ++ibin)
 	{
@@ -128,6 +124,7 @@ int main()
 					
 //////////////////////////////////////////////////////////////////////////////
 					//test filling bins
+					/*
 					if (ibin == 0)
 					{
 						soft_muon_yield->Fill(particlePt);
@@ -136,34 +133,9 @@ int main()
 					{
 						hard_muon_yield->Fill(particlePt);
 					}
+					*/
 //////////////////////////////////////////////////////////////////////////////
 				}
-				//filling tuples of W and Z
-				if (abs(pythia.event[i].id()) == 24 || abs(pythia.event[i].id()) == 23) 
-				{
-					double particlemother1 = pythia.event[pythia.event[i].mother1()].id();
-					double particlemother2 =pythia.event[pythia.event[i].mother2()].id();
-					double particledaughter1 =pythia.event[pythia.event[i].daughter1()].id();
-					double particledaughter2 =pythia.event[pythia.event[i].daughter2()].id();
-					double particlePAbs = pythia.event[i].pAbs();
-					double particleStatus = pythia.event[i].status();
-					double particlePt = pythia.event[i].pT();
-					double particleRapidity = pythia.event[i].y();
-					double particlePseudoRapidity = pythia.event[i].eta();
-					double particleID = pythia.event[i].id();
-					
-					//filling tuple bin entries
-					if (abs(pythia.event[i].id()) == 24) //for W
-					{ 
-					Wtuples[ibin]->Fill(ibin, iEvent,i, particleStatus, particlemother1, particlemother2, particledaughter1,
-							particledaughter2, particlePAbs, particlePt, particleRapidity, particlePseudoRapidity, particleID);
-					}
-					if (abs(pythia.event[i].id()) == 23) //for Z
-					{
-					Ztuples[ibin]->Fill(ibin, iEvent,i, particleStatus, particlemother1, particlemother2, particledaughter1,
-							particledaughter2, particlePAbs, particlePt, particleRapidity, particlePseudoRapidity, particleID);
-					}
-				}		
 			}
 			
 
@@ -221,18 +193,11 @@ int main()
 	for (int ibin = 0; ibin < nbins; ++ibin)
 	{
 		muontuples[ibin]->Write(Form("muon%d", ibin));
-		Wtuples[ibin]->Write(Form("W%d", ibin));
-		Ztuples[ibin]->Write(Form("Z%d", ibin));
 	}
 
 
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////
-	//DEBUGGING: checkings stuffs
+/*	//DEBUGGING: checkings stuffs
 	for (int i = 0; i < muontuples.size(); ++i)
 	 {
 		TNtuple* tuples = muontuples[i];
@@ -258,7 +223,7 @@ int main()
 				 << mother1 << " mother2ID=" << mother2 << " pAbs=" << pAbs
 				  << " pt=" << pt << " eta=" << eta << " id=" << id << endl;
 		 }
-	 }
+	 }*/
 ////////////////////////////////////////////////////////////////////////////
 
 	outFile->WriteObject(&binLuminosity, "luminosity");

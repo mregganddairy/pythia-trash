@@ -46,18 +46,14 @@ int main()
 
 	//tuple with relevant information on muons
 	vector<TNtuple*> muontuples(nbins);
-	vector<TNtuple*> Ztuples(nbins);
-	vector<TNtuple*> Wtuples(nbins);
 
 	vector<double> binLuminosity(nbins); //luminosity from generated process sigma to calculate cross sections
 	for (int i=0; i < nbins; ++i){
 		muontuples[i] = new TNtuple("mu_stuff", "mu_stuff", "binNo:eventNo:index:status:mother1:mother2:pAbs:pt:y:eta:id");
-		Wtuples[i] = new TNtuple("W_stuff", "W_stuff", "binNo:eventNo:index:status:mother1:mother2:daughter1:daughter2:pAbs:pt:y:eta:id");
-		Ztuples[i] = new TNtuple("Z_stuff", "Z_stuff", "binNo:eventNo:index:status:mother1:mother2:daughter1:daughter2:pAbs:pt:y:eta:id");
 	//muon number
 		}
 	
-	int nevents = 10000;
+	int nevents = 1000;
 
 	for (int ibin = 0; ibin < nbins; ++ibin)
 	{
@@ -133,7 +129,7 @@ int main()
 							particlePAbs, particlePt, particleRapidity, particlePseudoRapidity, particleID);
 					
 //////////////////////////////////////////////////////////////////////////////
-					//test filling bins
+	/*				//test filling bins
 					if (ibin == 0)
 					{
 						soft_muon_yield->Fill(particlePt);
@@ -142,37 +138,10 @@ int main()
 					{
 						hard_muon_yield->Fill(particlePt);
 					}
+					*/
 //////////////////////////////////////////////////////////////////////////////
 				}
-				//filling tuples of W and Z
-				if (abs(event[i].id()) == 24 || abs(event[i].id()) == 23) 
-				{
-					double particlemother1 = event[event[i].mother1()].id();
-					double particlemother2 =event[event[i].mother2()].id();
-					double particledaughter1 =event[event[i].daughter1()].id();
-					double particledaughter2 =event[event[i].daughter2()].id();
-					double particlePAbs = event[i].pAbs();
-					double particleStatus = event[i].status();
-					double particlePt = event[i].pT();
-					double particleRapidity = event[i].y();
-					double particlePseudoRapidity = event[i].eta();
-					double particleID = event[i].id();
-					double eventNo = event_count;
-					
-					//filling tuple bin entries
-					if (abs(event[i].id()) == 24) //for W
-					{ 
-					Wtuples[ibin]->Fill(ibin, eventNo,i, particleStatus, particlemother1, particlemother2, particledaughter1,
-							particledaughter2, particlePAbs, particlePt, particleRapidity, particlePseudoRapidity, particleID);
-					}
-					if (abs(event[i].id()) == 23) //for Z
-					{
-					Ztuples[ibin]->Fill(ibin, eventNo,i, particleStatus, particlemother1, particlemother2, particledaughter1,
-							particledaughter2, particlePAbs, particlePt, particleRapidity, particlePseudoRapidity, particleID);
-					}
-				}		
 			}
-			
 
 		});
 		binLuminosity[ibin] = event_count/(pythia.sigmaGen()*pow(10,9));//integrated luminosity used for normalisation/calculation of the cross sections
@@ -228,14 +197,7 @@ int main()
 	for (int ibin = 0; ibin < nbins; ++ibin)
 	{
 		muontuples[ibin]->Write(Form("muon%d", ibin));
-		Wtuples[ibin]->Write(Form("W%d", ibin));
-		Ztuples[ibin]->Write(Form("Z%d", ibin));
 	}
-
-
-
-
-
 
 
 /*//////////////////////////////////////////////////////////////////////////////////////////
