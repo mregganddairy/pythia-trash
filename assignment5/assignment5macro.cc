@@ -35,7 +35,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	
 	//total muon cross section with no cuts
 	TH1F* sub_TOTAL_muon_cross_section = new TH1F("sub_TOTAL_muon_cross_section", "", 50,0,100);
-	TH1F* TOTAL_muon_cross_section = new TH1F("TOTAL_muon_cross_section", "cross section from different mothers", 50,0,100);
+	TH1F* TOTAL_muon_cross_section = new TH1F("TOTAL_muon_cross_section", "differential cross section from different mother particles (weak processes)", 50,0,100);
 
 	//for pt distribution in central barrel
 	TH1F* sub_muon_cross_section_cb = new TH1F("sub_muon_cross_section_cb","", 100, 0, 100);
@@ -63,6 +63,10 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 
 	TH1F* sub_Z_muon_cross_section = new TH1F("sub_Z_muon_cross_section","", 50,  0, 100);
 	TH1F* Z_muon_cross_section = new TH1F("Z_muon_cross_section","", 50,  0, 100);
+
+	//muons coming from muons
+	TH1F* sub_muon_muon_cross_section = new TH1F("sub_muon_muon_cross_section","", 50,  0, 100);
+	TH1F* muon_muon_cross_section = new TH1F("muon_muon_cross_section","", 50,  0, 100);
 
 	//muon cross sections which don't come from bottom or charm
 	TH1F* sub_other_muon_cross_section = new TH1F("sub_other_muon_cross_section","", 50,  0, 100);
@@ -174,10 +178,14 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 				sub_Z_muon_cross_section->Fill(pt);
 			}
 
-			else
+			else if (!(abs(mother1) == 13) && !(abs(mother2) == 13))
 			{
 			sub_other_muon_cross_section->Fill(pt);
-			cout << " mom1 id: "<< mother1<< endl;
+	//		cout << " mom1 id: "<< mother1<< endl;
+			}
+			else if ((abs(mother1) == 13))
+			{
+				sub_muon_muon_cross_section->Fill(pt);
 			}
 		}
 		
@@ -192,6 +200,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 		sub_other_muon_cross_section->Scale(scalebin, "width");
 		sub_W_muon_cross_section->Scale(scalebin, "width");
 		sub_Z_muon_cross_section->Scale(scalebin, "width");
+		sub_muon_muon_cross_section->Scale(scalebin, "width");
 		
 
 		TOTAL_muon_cross_section->Add(sub_TOTAL_muon_cross_section);
@@ -202,6 +211,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 		other_muon_cross_section->Add(sub_other_muon_cross_section);
 		W_muon_cross_section->Add(sub_W_muon_cross_section);
 		Z_muon_cross_section->Add(sub_Z_muon_cross_section);
+		muon_muon_cross_section->Add(sub_muon_muon_cross_section);
 	}	
 	TFile* outFile =new TFile("muonyieldmacro.root", "RECREATE");
 
@@ -210,13 +220,13 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	//checking contributions in different regions
 	c2->cd();
 //	total_muon_cross_section_cb->SetMinimum(0.);
-	total_muon_cross_section_fr->GetXaxis()->SetTitle("pt (GeV)");
+	total_muon_cross_section_fr->GetXaxis()->SetTitle("pt (GeV/c)");
 	total_muon_cross_section_fr->GetYaxis()->SetTitle("d#sigma/dpt (pb/GeV/c)");
 	total_muon_cross_section_fr->SetLineColor(kRed);
 	total_muon_cross_section_fr->Draw("SAME");
 
 //	total_muon_cross_section_cb->SetMinimum(0.);
-	total_muon_cross_section_cb->GetXaxis()->SetTitle("pt (GeV)");
+	total_muon_cross_section_cb->GetXaxis()->SetTitle("pt (GeV/c)");
 	total_muon_cross_section_cb->SetLineColor(kBlue);
 	total_muon_cross_section_cb->GetYaxis()->SetTitle("d#sigma/dpt (pb/GeV/c)");
 	total_muon_cross_section_cb->Draw("SAME");
@@ -235,14 +245,15 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	c3->cd();
 
 	TOTAL_muon_cross_section->GetYaxis()->SetTitle("d#sigma/dpt (pb/GeV/c)");
-	TOTAL_muon_cross_section->GetXaxis()->SetTitle("pt (GeV)");
+	TOTAL_muon_cross_section->GetXaxis()->SetTitle("pt (GeV/c)");
 
 	TOTAL_muon_cross_section->Draw("SAME");
-	b_muon_cross_section->Draw("SAME");
 	c_muon_cross_section->Draw("SAME");
 	Z_muon_cross_section->Draw("SAME");
 	W_muon_cross_section->Draw("SAME");
+	b_muon_cross_section->Draw("SAME");
 	other_muon_cross_section->Draw("SAME");
+	muon_muon_cross_section->Draw("SAME");
 
 	TOTAL_muon_cross_section->SetLineColor(kBlack);
 	b_muon_cross_section->SetLineColor(kRed);
@@ -250,14 +261,16 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	W_muon_cross_section->SetLineColor(kBlue);
 	Z_muon_cross_section->SetLineColor(kYellow);
 	other_muon_cross_section->SetLineColor(kMagenta);
+	muon_muon_cross_section->SetLineColor(20);
 
 	TLegend *leg2 = new TLegend(0.6, 0.7, 0.9, 0.9);
 	leg2->AddEntry(TOTAL_muon_cross_section,"Total", "lep");
-	leg2->AddEntry(b_muon_cross_section,"bottom hadron moms", "lep");
-	leg2->AddEntry(c_muon_cross_section,"charm hadron moms", "lep");
-	leg2->AddEntry(Z_muon_cross_section, "Z boson moms", "lep");
-	leg2->AddEntry(W_muon_cross_section, "W boson moms", "lep");
-	leg2->AddEntry(other_muon_cross_section,"other moms", "lep");
+	leg2->AddEntry(b_muon_cross_section,"bottom -> muon", "lep");
+	leg2->AddEntry(c_muon_cross_section,"charm -> muon", "lep");
+	leg2->AddEntry(Z_muon_cross_section, "Z -> muon", "lep");
+	leg2->AddEntry(W_muon_cross_section, "W -> muon", "lep");
+	leg2->AddEntry(other_muon_cross_section,"other -> muon", "lep");
+	leg2->AddEntry(muon_muon_cross_section,"muon -> muon", "lep");
 	leg2->Draw("SAME");
 
 	c3->Write();

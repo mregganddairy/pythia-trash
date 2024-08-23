@@ -20,6 +20,7 @@ int main()
 
 	//processes which will be on for all bins
 	pythia.readString("WeakDoubleBoson:all = on");
+	pythia.readString("WeakZ0:gmZmode =2");
 	pythia.readString("Parallelism:numThreads = 3");
 	
 	//force Z and W to decay to muons to get better stats
@@ -56,7 +57,7 @@ int main()
 	//muon number
 		}
 	
-	int nevents = 1000000;
+	int nevents = 10000;
 
 	for (int ibin = 0; ibin < nbins; ++ibin)
 	{
@@ -237,7 +238,7 @@ int main()
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////
+/*//////////////////////////////////////////////////////////////////////////////////////////
 	//DEBUGGING: checkings stuffs
 	for (int i = 0; i < muontuples.size(); ++i)
 	 {
@@ -265,7 +266,7 @@ int main()
 				  << " pt=" << pt << " eta=" << eta << " id=" << id << endl;
 		 }
 	 }
-////////////////////////////////////////////////////////////////////////////
+*////////////////////////////////////////////////////////////////////////////
 
 	outFile->WriteObject(&binLuminosity, "luminosity");
 

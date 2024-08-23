@@ -42,7 +42,7 @@ int main()
 	//muon number
 		}
 	
-	int nevents = 2000000;
+	int nevents = 5000000;
 
 	for (int ibin = 0; ibin < nbins; ++ibin)
 	{
