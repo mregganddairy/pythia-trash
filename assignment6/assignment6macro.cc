@@ -76,7 +76,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 
 
 //*******************************************************************************
-//Now looking at W-  
+//Now looking at W+  
 //*******************************************************************************
 	
 	{
@@ -119,8 +119,11 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	//filling histograms
 	for (int event_counter = 0; event_counter < particle_count; event_counter++)
 	{
+		
 		muontuples->GetEntry(event_counter);
-
+		
+		if (eta>-4.0 && eta<-2.5)
+		{
 		sub_TOTAL_muon_cross_section->Fill(pt);
 
 		//check if muon is in a particular region for region plots
@@ -164,11 +167,11 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 
 		//checing if mother particle is a weak vector boson 
 
-		else if (abs(mother1) == 24)
+		else if ((abs(mother1) == 24) || ((abs(mother1) == 13) && (abs(mother2) == 90)))
 		{
 			sub_W_muon_cross_section->Fill(pt);
 
-			if (mother1 == 24)
+			if (mother1 == 24) 
 			{
 				sub_Wp_muon_cross_section->Fill(pt);
 			}
@@ -178,7 +181,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 				sub_Wm_muon_cross_section->Fill(pt);
 			}
 		}
-		else if(abs(mother1) == 23)
+		else if((abs(mother1) == 23) || ((abs(mother1) == 13) && (abs(mother2) == 90)))
 		{
 			sub_Z_muon_cross_section->Fill(pt);
 		}
@@ -188,10 +191,11 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 		sub_other_muon_cross_section->Fill(pt);
 		//cout << " mom1 id: "<< mother1<< endl;
 		}
-		else if ((abs(mother1) == 13))
+		else if (((abs(mother1) == 13)) && !((abs(mother1) == 13) && (abs(mother2) == 90)))
 		{
 			sub_muon_muon_cross_section->Fill(pt);
 		}
+	}
 	}
 	
 	//normalising bins for calculating the cross section
@@ -284,8 +288,11 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	//filling histograms
 	for (int event_counter = 0; event_counter < particle_count; event_counter++)
 	{
+
 		muontuples->GetEntry(event_counter);
 
+		if (eta>-4.0 && eta<-2.5)
+		{
 		sub_TOTAL_muon_cross_section->Fill(pt);
 
 		//check if muon is in a particular region for region plots
@@ -329,7 +336,8 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 
 		//checing if mother particle is a weak vector boson 
 
-		else if (abs(mother1) == 24)
+		else if ((abs(mother1) == 24) || ((abs(mother1) == 13) && (abs(mother2) == 90)))
+
 		{
 			sub_W_muon_cross_section->Fill(pt);
 
@@ -343,7 +351,8 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 				sub_Wm_muon_cross_section->Fill(pt);
 			}
 		}
-		else if(abs(mother1) == 23)
+		else if((abs(mother1) == 23) || ((abs(mother1) == 13) && (abs(mother2) == 90)))
+
 		{
 			sub_Z_muon_cross_section->Fill(pt);
 		}
@@ -353,10 +362,13 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 		sub_other_muon_cross_section->Fill(pt);
 		//cout << " mom1 id: "<< mother1<< endl;
 		}
-		else if ((abs(mother1) == 13))
+		else if (((abs(mother1) == 13)) && !((abs(mother1) == 13) && (abs(mother2) == 90))  && !((abs(mother1) == 13) && (abs(mother2) == 13)))
+
 		{
+			cout << mother1 << "  " << mother2 << endl;
 			sub_muon_muon_cross_section->Fill(pt);
 		}
+	}
 	}
 	
 	//normalising bins for calculating the cross section
@@ -444,8 +456,11 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	//filling histograms
 	for (int event_counter = 0; event_counter < particle_count; event_counter++)
 	{
-		muontuples->GetEntry(event_counter);
 
+		muontuples->GetEntry(event_counter);
+		
+		if (eta>-4.0 && eta<-2.5)
+		{
 		sub_TOTAL_muon_cross_section->Fill(pt);
 
 		//check if muon is in a particular region for region plots
@@ -489,7 +504,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 
 		//checing if mother particle is a weak vector boson 
 
-		else if (abs(mother1) == 24)
+		else if ((abs(mother1) == 24) || ((abs(mother1) == 13) && (abs(mother2) == 90)))
 		{
 			sub_W_muon_cross_section->Fill(pt);
 
@@ -503,7 +518,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 				sub_Wm_muon_cross_section->Fill(pt);
 			}
 		}
-		else if(abs(mother1) == 23)
+		else if ((abs(mother1) == 23) || ((abs(mother1) == 13) && (abs(mother2) == 90)) || ((abs(mother1) == 13) && (abs(mother2) == 13)))
 		{
 			sub_Z_muon_cross_section->Fill(pt);
 		}
@@ -513,10 +528,11 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 		sub_other_muon_cross_section->Fill(pt);
 		//cout << " mom1 id: "<< mother1<< endl;
 		}
-		else if ((abs(mother1) == 13))
+		else if (((abs(mother1) == 13)) && !((abs(mother1) == 13) && (abs(mother2) == 90))  && !((abs(mother1) == 13) && (abs(mother2) == 13)))
 		{
 			sub_muon_muon_cross_section->Fill(pt);
 		}
+	}
 	}
 	
 	//normalising bins for calculating the cross section
@@ -589,7 +605,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	TOTAL_muon_cross_section->Draw("SAME");
 	c_muon_cross_section->Draw("SAME");
 	Z_muon_cross_section->Draw("SAME");
-	//W_muon_cross_section->Draw("SAME");
+	W_muon_cross_section->Draw("SAME");
 	Wm_muon_cross_section->Draw("SAME");
 	Wp_muon_cross_section->Draw("SAME");
 	b_muon_cross_section->Draw("SAME");
@@ -599,7 +615,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	TOTAL_muon_cross_section->SetLineColor(kBlack);
 	b_muon_cross_section->SetLineColor(kRed);
 	c_muon_cross_section->SetLineColor(kGreen);
-	//W_muon_cross_section->SetLineColor(kBlue);
+	W_muon_cross_section->SetLineColor(kBlue);
 	Wm_muon_cross_section->SetLineColor(7);
 	Wp_muon_cross_section->SetLineColor(8);
 	Z_muon_cross_section->SetLineColor(kYellow);
@@ -611,7 +627,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	leg2->AddEntry(b_muon_cross_section,"bottom -> muon", "lep");
 	leg2->AddEntry(c_muon_cross_section,"charm -> muon", "lep");
 	leg2->AddEntry(Z_muon_cross_section, "Z -> muon", "lep");
-	//leg2->AddEntry(W_muon_cross_section, "W -> muon", "lep");
+	leg2->AddEntry(W_muon_cross_section, "W -> muon", "lep");
 	leg2->AddEntry(Wp_muon_cross_section, "W+ -> muon", "lep");
 	leg2->AddEntry(Wm_muon_cross_section, "W- -> muon", "lep");
 	leg2->AddEntry(other_muon_cross_section,"other -> muon", "lep");

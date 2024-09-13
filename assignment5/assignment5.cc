@@ -20,8 +20,9 @@ int main()
 
 	//processes which will be on for all bins
 	pythia.readString("WeakDoubleBoson:all = on");
-	pythia.readString("WeakZ0:gmZmode =2");
-	pythia.readString("Parallelism:numThreads = 3");
+//	pythia.readString("WeakSingleBoson:ffbar2W =on");
+//	pythia.readString("WeakZ0:gmZmode =2");
+	pythia.readString("Parallelism:numThreads = 4");
 	
 	//force Z and W to decay to muons to get better stats
 	pythia.readString("23:onMode = off");
@@ -47,13 +48,18 @@ int main()
 	//tuple with relevant information on muons
 	vector<TNtuple*> muontuples(nbins);
 
+
+	//defining branches within the tree
+
 	vector<double> binLuminosity(nbins); //luminosity from generated process sigma to calculate cross sections
+
 	for (int i=0; i < nbins; ++i){
-		muontuples[i] = new TNtuple("mu_stuff", "mu_stuff", "binNo:eventNo:index:status:mother1:mother2:pAbs:pt:y:eta:id");
+		muontuples[i] = new TNtuple("mu_stuff", "mu_stuff", "binNo:eventNo:index:status:mother1:mother2:mother11:mother111:pAbs:pt:y:eta:id");
 	//muon number
+
 		}
 	
-	int nevents = 1000;
+	int nevents = 10000;
 
 	for (int ibin = 0; ibin < nbins; ++ibin)
 	{
@@ -116,6 +122,8 @@ int main()
 				{
 					double particlemother1 = event[event[i].mother1()].id();
 					double particlemother2 =event[event[i].mother2()].id();
+					double particlemother11 =event[event[event[i].mother1()].mother1()].id();
+					double particlemother111 =event[event[event[event[i].mother1()].mother1()].mother1()].id();
 					double particlePAbs = event[i].pAbs();
 					double particleStatus = event[i].status();
 					double particlePt = event[i].pT();
@@ -123,9 +131,25 @@ int main()
 					double particlePseudoRapidity = event[i].eta();
 					double particleID = event[i].id();
 					double eventNo = event_count;
+
+
+					cout<< "testing moms: OG particle: " <<event[i].id() <<"("<<event[i].index()<< ")" << ". mothers: " << event[event[i].mother1()].id()<<"("<< event[i].mother1()<<")" << " and "<< event[event[i].mother2()].id()<<"("<< event[i].mother2()<< ")"<< ". mothers of mothers: " << event[event[event[i].mother1()].mother1()].id()<<"("<< event[event[i].mother1()].mother1()<< ")" <<" and " << event[event[event[i].mother1()].mother2()].id()<<"("<< event[event[i].mother1()].mother2()<<")"<< endl;
+
+					//cout <<"testing daughters: OG particle: " <<event[i].id() <<". daughter particles: "<< event[i].daughter1() <<" and "<< event[i].daughter2() << ". daughter particles: "<<event[event[i].daughter1()].daughter1() << " and " << event[event[i].daughter1()].daughter2() << endl;
+					
+					////man fuck this noise//////
+					if ((abs(particlemother1) == 13) && (abs(particlemother2 == 13)))
+					{
+					cout << "newdaughterList: [";
+					std::cout << event[event[event[i].mother1()].daughter1()].id() << ", " << event[event[event[i].mother1()].daughter2()].id(); 
+					cout << "]" << endl;
+					cout << "momentum of daughter and mother:" << event[event[event[i].mother1()].daughter1()].pT() << " and pT_m1=" << event[event[i].mother1()].pT() << " and pT_d2=" << event[event[event[i].mother1()].daughter2()].pT() << endl;
+					}
+
 					
 					//filling tuple bin entries
-					muontuples[ibin]->Fill(ibin,eventNo,i, particleStatus, particlemother1, particlemother2, 
+					muontuples[ibin]->Fill(ibin,eventNo,i, particleStatus, particlemother1, particlemother2, particlemother11, 
+							particlemother111, 
 							particlePAbs, particlePt, particleRapidity, particlePseudoRapidity, particleID);
 					
 //////////////////////////////////////////////////////////////////////////////

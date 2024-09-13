@@ -105,8 +105,8 @@ int main() {
 				{
 					double particlemother1 = pythia.event[pythia.event[i].mother1()].id();
 					double particlemother2 =pythia.event[pythia.event[i].mother2()].id();
-					double particledaughter1 =pythia.event[pythia.event[i].daughter1()].id();
-					double particledaughter2 =pythia.event[pythia.event[i].daughter2()].id();
+					double particledaughter1 =pythia.event[i].daughter1();
+					double particledaughter2 =pythia.event[i].daughter2();
 					double particlePAbs = pythia.event[i].pAbs();
 					double particleStatus = pythia.event[i].status();
 					double particlePt = pythia.event[i].pT();
