@@ -35,7 +35,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	
 	//total muon cross section with no cuts
 	TH1F* sub_TOTAL_muon_cross_section = new TH1F("sub_TOTAL_muon_cross_section", "", 50,0,100);
-	TH1F* TOTAL_muon_cross_section = new TH1F("TOTAL_muon_cross_section", "differential cross section from different mother particles (weak processes)", 50,0,100);
+	TH1F* TOTAL_muon_cross_section = new TH1F("TOTAL_muon_cross_section", "LO differential cross section from different mother particles (weak processes)", 50,0,100);
 
 	//for pt distribution in central barrel
 	TH1F* sub_muon_cross_section_cb = new TH1F("sub_muon_cross_section_cb","", 100, 0, 100);
@@ -186,6 +186,18 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 			else if (abs(mother1) == 24 || (abs(mother11) ==24) || (abs(mother111) ==24))
 			{
 				sub_W_muon_cross_section->Fill(pt);
+
+				if (mother1 == 24 || (mother11 ==24) || (mother111 ==24))
+				{
+				sub_Wp_muon_cross_section->Fill(pt);
+				}
+
+				else if (mother1 == -24 || (mother11 ==-24) || (mother111 ==-24))
+				{
+				sub_Wm_muon_cross_section->Fill(pt);
+				}
+
+
 			}
 			else if(abs(mother1) == 23 || (abs(mother11) ==23) || (abs(mother111) ==23))
 			{
@@ -225,6 +237,8 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 		sub_c_muon_cross_section->Scale(scalebin, "width");
 		sub_other_muon_cross_section->Scale(scalebin, "width");
 		sub_W_muon_cross_section->Scale(scalebin, "width");
+		sub_Wm_muon_cross_section->Scale(scalebin, "width");
+		sub_Wp_muon_cross_section->Scale(scalebin, "width");
 		sub_Z_muon_cross_section->Scale(scalebin, "width");
 		sub_muon_muon_cross_section->Scale(scalebin, "width");
 
@@ -239,6 +253,8 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 		c_muon_cross_section->Add(sub_c_muon_cross_section);
 		other_muon_cross_section->Add(sub_other_muon_cross_section);
 		W_muon_cross_section->Add(sub_W_muon_cross_section);
+		Wp_muon_cross_section->Add(sub_Wp_muon_cross_section);
+		Wm_muon_cross_section->Add(sub_Wm_muon_cross_section);
 		Z_muon_cross_section->Add(sub_Z_muon_cross_section);
 		muon_muon_cross_section->Add(sub_muon_muon_cross_section);
 
@@ -275,48 +291,78 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 
 	//plotting muons from different sources
 	c3->cd();
+	c3->SetLogy();
 
 	TOTAL_muon_cross_section->GetYaxis()->SetTitle("d#sigma/dpt (pb/GeV/c)");
 	TOTAL_muon_cross_section->GetXaxis()->SetTitle("pt (GeV/c)");
 
 	TOTAL_muon_cross_section->Draw("SAME");
-//	c_muon_cross_section->Draw("SAME");
+	c_muon_cross_section->Draw("SAME");
 	Z_muon_cross_section->Draw("SAME");
 	W_muon_cross_section->Draw("SAME");
-//	b_muon_cross_section->Draw("SAME");
-//	other_muon_cross_section->Draw("SAME");
+	Wp_muon_cross_section->Draw("SAME");
+	Wm_muon_cross_section->Draw("SAME");
+	b_muon_cross_section->Draw("SAME");
+	other_muon_cross_section->Draw("SAME");
 	muon_muon_cross_section->Draw("SAME");
 
-	muon_kak_cross_section->Draw("SAME");
+/*	muon_kak_cross_section->Draw("SAME");
 	muon_annihl_cross_section->Draw("SAME");
+*/
 
 	TOTAL_muon_cross_section->SetLineColor(kBlack);
-//	b_muon_cross_section->SetLineColor(kRed);
-//	c_muon_cross_section->SetLineColor(kGreen);
+	b_muon_cross_section->SetLineColor(kRed);
+	c_muon_cross_section->SetLineColor(kGreen);
 	W_muon_cross_section->SetLineColor(kBlue);
+	Wm_muon_cross_section->SetLineColor(7);
+	Wp_muon_cross_section->SetLineColor(8);
 	Z_muon_cross_section->SetLineColor(kYellow);
-//	other_muon_cross_section->SetLineColor(kMagenta);
+	other_muon_cross_section->SetLineColor(kMagenta);
 	muon_muon_cross_section->SetLineColor(20);
 
-	muon_kak_cross_section->SetLineColor(kRed);
-	muon_annihl_cross_section->SetLineColor(kGreen);
+	b_muon_cross_section->SetMarkerStyle(25);
+	b_muon_cross_section->SetMarkerColor(kRed);
+	c_muon_cross_section->SetMarkerStyle(26);
+	c_muon_cross_section->SetMarkerColor(kGreen);
+	W_muon_cross_section->SetMarkerStyle(28);
+	W_muon_cross_section->SetMarkerColor(kBlue);
+	Z_muon_cross_section->SetMarkerStyle(23);
+	Z_muon_cross_section->SetMarkerColor(kYellow);
+	TOTAL_muon_cross_section->SetMarkerStyle(29);
+	TOTAL_muon_cross_section->SetMarkerColor(kBlack);
+	Wm_muon_cross_section->SetMarkerStyle(20);
+	Wm_muon_cross_section->SetMarkerColor(7);
+	Wp_muon_cross_section->SetMarkerStyle(24);
+	Wp_muon_cross_section->SetMarkerColor(8);
+	muon_muon_cross_section->SetMarkerStyle(39);
+	muon_muon_cross_section->SetMarkerColor(20);
 
-	muon_kak_cross_section->SetMarkerStyle(22);
+/*	muon_kak_cross_section->SetLineColor(kRed);
+	muon_annihl_cross_section->SetLineColor(kGreen);
+*/
+
+/*	muon_kak_cross_section->SetMarkerStyle(22);
 	muon_annihl_cross_section->SetMarkerStyle(24);
+*/
 
 	TLegend *leg2 = new TLegend(0.6, 0.7, 0.9, 0.9);
 	leg2->AddEntry(TOTAL_muon_cross_section,"Total", "lep");
-//	leg2->AddEntry(b_muon_cross_section,"bottom -> muon", "lep");
-//	leg2->AddEntry(c_muon_cross_section,"charm -> muon", "lep");
-	leg2->AddEntry(Z_muon_cross_section, "Z -> muon", "lep");
-	leg2->AddEntry(W_muon_cross_section, "W -> muon", "lep");
-//	leg2->AddEntry(other_muon_cross_section,"other -> muon", "lep");
-	leg2->AddEntry(muon_muon_cross_section,"muon -> muonX", "lep");
+	leg2->AddEntry(b_muon_cross_section,"W/Z/#gamma*(probably) #rightarrow b #rightarrow #mu", "lep");
+	leg2->AddEntry(c_muon_cross_section,"W/Z/#gamma*(probably) #rightarrow c #rightarrow #mu", "lep");
+	leg2->AddEntry(Z_muon_cross_section, "Z/#gamma* #rightarrow #mu", "lep");
+	leg2->AddEntry(W_muon_cross_section, "W #rightarrow #mu", "lep");
+	leg2->AddEntry(Wp_muon_cross_section, "W+ #rightarrow #mu", "lep");
+	leg2->AddEntry(Wm_muon_cross_section, "W- #rightarrow #mu", "lep");
+	leg2->AddEntry(other_muon_cross_section,"other #rightarrow #mu", "lep");
+	leg2->AddEntry(muon_muon_cross_section,"#mu #rightarrow #mu + X", "lep");
 
-	leg2->AddEntry(muon_kak_cross_section,"muon -> muon photon", "lep");
+/*	leg2->AddEntry(muon_kak_cross_section,"muon -> muon photon", "lep");
 	leg2->AddEntry(muon_annihl_cross_section,"muon -> muon", "lep");
+*/
 	leg2->Draw("SAME");
 
+	TOTAL_muon_cross_section->SetMinimum(0.1);
+	TOTAL_muon_cross_section->SetMaximum(50000);
 	c3->Write();
 
 

@@ -121,9 +121,8 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	{
 		
 		muontuples->GetEntry(event_counter);
+	//if ((eta > -4.0) && (eta < -2.5)){
 		
-		if (eta>-4.0 && eta<-2.5)
-		{
 		sub_TOTAL_muon_cross_section->Fill(pt);
 
 		//check if muon is in a particular region for region plots
@@ -171,19 +170,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 		{
 			sub_W_muon_cross_section->Fill(pt);
 
-			if (mother1 == 24) 
-			{
-				sub_Wp_muon_cross_section->Fill(pt);
-			}
-			
-			else if (mother1 == -24)
-			{
-				sub_Wm_muon_cross_section->Fill(pt);
-			}
-		}
-		else if((abs(mother1) == 23) || ((abs(mother1) == 13) && (abs(mother2) == 90)))
-		{
-			sub_Z_muon_cross_section->Fill(pt);
+			sub_Wp_muon_cross_section->Fill(pt);
 		}
 
 		else if (!(abs(mother1) == 13) && !(abs(mother2) == 13))
@@ -195,7 +182,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 		{
 			sub_muon_muon_cross_section->Fill(pt);
 		}
-	}
+	//}
 	}
 	
 	//normalising bins for calculating the cross section
@@ -291,8 +278,8 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 
 		muontuples->GetEntry(event_counter);
 
-		if (eta>-4.0 && eta<-2.5)
-		{
+	//if ((eta > -4.0) && (eta < -2.5)){
+
 		sub_TOTAL_muon_cross_section->Fill(pt);
 
 		//check if muon is in a particular region for region plots
@@ -340,21 +327,8 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 
 		{
 			sub_W_muon_cross_section->Fill(pt);
-
-			if (mother1 == 24)
-			{
-				sub_Wp_muon_cross_section->Fill(pt);
-			}
 			
-			else if (mother1 == -24)
-			{
-				sub_Wm_muon_cross_section->Fill(pt);
-			}
-		}
-		else if((abs(mother1) == 23) || ((abs(mother1) == 13) && (abs(mother2) == 90)))
-
-		{
-			sub_Z_muon_cross_section->Fill(pt);
+			sub_Wm_muon_cross_section->Fill(pt);
 		}
 
 		else if (!(abs(mother1) == 13) && !(abs(mother2) == 13))
@@ -368,7 +342,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 			cout << mother1 << "  " << mother2 << endl;
 			sub_muon_muon_cross_section->Fill(pt);
 		}
-	}
+	//}
 	}
 	
 	//normalising bins for calculating the cross section
@@ -459,8 +433,8 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 
 		muontuples->GetEntry(event_counter);
 		
-		if (eta>-4.0 && eta<-2.5)
-		{
+	//if ((eta > -4.0) && (eta < -2.5)){
+		
 		sub_TOTAL_muon_cross_section->Fill(pt);
 
 		//check if muon is in a particular region for region plots
@@ -503,21 +477,6 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 		else if (c_found){sub_c_muon_cross_section->Fill(pt);}
 
 		//checing if mother particle is a weak vector boson 
-
-		else if ((abs(mother1) == 24) || ((abs(mother1) == 13) && (abs(mother2) == 90)))
-		{
-			sub_W_muon_cross_section->Fill(pt);
-
-			if (mother1 == 24)
-			{
-				sub_Wp_muon_cross_section->Fill(pt);
-			}
-			
-			else if (mother1 == -24)
-			{
-				sub_Wm_muon_cross_section->Fill(pt);
-			}
-		}
 		else if ((abs(mother1) == 23) || ((abs(mother1) == 13) && (abs(mother2) == 90)) || ((abs(mother1) == 13) && (abs(mother2) == 13)))
 		{
 			sub_Z_muon_cross_section->Fill(pt);
@@ -532,7 +491,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 		{
 			sub_muon_muon_cross_section->Fill(pt);
 		}
-	}
+	//}
 	}
 	
 	//normalising bins for calculating the cross section
@@ -598,6 +557,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 
 	//plotting muons from different sources
 	c3->cd();
+	c3->SetLogy();
 
 	TOTAL_muon_cross_section->GetYaxis()->SetTitle("d#sigma/dpt (pb/GeV/c)");
 	TOTAL_muon_cross_section->GetXaxis()->SetTitle("pt (GeV/c)");
@@ -622,18 +582,39 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	other_muon_cross_section->SetLineColor(kMagenta);
 	muon_muon_cross_section->SetLineColor(20);
 
+	b_muon_cross_section->SetMarkerStyle(25);
+	b_muon_cross_section->SetMarkerColor(kRed);
+	c_muon_cross_section->SetMarkerStyle(26);
+	c_muon_cross_section->SetMarkerColor(kGreen);
+	W_muon_cross_section->SetMarkerStyle(28);
+	W_muon_cross_section->SetMarkerColor(kBlue);
+	Z_muon_cross_section->SetMarkerStyle(23);
+	Z_muon_cross_section->SetMarkerColor(kYellow);
+	TOTAL_muon_cross_section->SetMarkerStyle(29);
+	TOTAL_muon_cross_section->SetMarkerColor(kBlack);
+	Wm_muon_cross_section->SetMarkerStyle(20);
+	Wm_muon_cross_section->SetMarkerColor(7);
+	Wp_muon_cross_section->SetMarkerStyle(24);
+	Wp_muon_cross_section->SetMarkerColor(8);
+	muon_muon_cross_section->SetMarkerStyle(39);
+	muon_muon_cross_section->SetMarkerColor(20);
+
+
+
 	TLegend *leg2 = new TLegend(0.6, 0.7, 0.9, 0.9);
 	leg2->AddEntry(TOTAL_muon_cross_section,"Total", "lep");
-	leg2->AddEntry(b_muon_cross_section,"bottom -> muon", "lep");
-	leg2->AddEntry(c_muon_cross_section,"charm -> muon", "lep");
-	leg2->AddEntry(Z_muon_cross_section, "Z -> muon", "lep");
-	leg2->AddEntry(W_muon_cross_section, "W -> muon", "lep");
-	leg2->AddEntry(Wp_muon_cross_section, "W+ -> muon", "lep");
-	leg2->AddEntry(Wm_muon_cross_section, "W- -> muon", "lep");
-	leg2->AddEntry(other_muon_cross_section,"other -> muon", "lep");
-	leg2->AddEntry(muon_muon_cross_section,"muon -> muon", "lep");
+	leg2->AddEntry(b_muon_cross_section,"W/Z/#gamma*(probably) #rightarrow b #rightarrow #mu", "lep");
+	leg2->AddEntry(c_muon_cross_section,"W/Z/#gamma*(probably) #rightarrow c #rightarrow #mu", "lep");
+	leg2->AddEntry(Z_muon_cross_section, "Z/#gamma* #rightarrow #mu", "lep");
+	leg2->AddEntry(W_muon_cross_section, "W #rightarrow #mu", "lep");
+	leg2->AddEntry(Wp_muon_cross_section, "W+ #rightarrow #mu", "lep");
+	leg2->AddEntry(Wm_muon_cross_section, "W- #rightarrow #mu", "lep");
+	leg2->AddEntry(other_muon_cross_section,"other #rightarrow #mu", "lep");
+	leg2->AddEntry(muon_muon_cross_section,"#mu #rightarrow #mu + X", "lep");
 	leg2->Draw("SAME");
 
+	TOTAL_muon_cross_section->SetMinimum(0.1);
+	TOTAL_muon_cross_section->SetMaximum(1000);
 	c3->Write();
 
 

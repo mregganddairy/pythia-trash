@@ -19,17 +19,19 @@ int main()
 	PythiaParallel pythia;
 
 	//processes which will be on for all bins
-	pythia.readString("WeakDoubleBoson:all = on");
-//	pythia.readString("WeakSingleBoson:ffbar2W =on");
+//	pythia.readString("WeakDoubleBoson:all = on");
+	pythia.readString("WeakSingleBoson:ffbar2W =on");
+	pythia.readString("WeakSingleBoson:ffbar2gmZ = on");
 //	pythia.readString("WeakZ0:gmZmode =2");
 	pythia.readString("Parallelism:numThreads = 4");
 	
 	//force Z and W to decay to muons to get better stats
-	pythia.readString("23:onMode = off");
+/*	pythia.readString("23:onMode = off");
 	pythia.readString("23:onIfAny = 13 -13"); 
 	
 	pythia.readString("24:onMode = off");
 	pythia.readString("24:onIfAny =  13 14"); 
+	*/
 
 	//creating ROOT file for histograms
 	TFile* outFile = new TFile("muonyield.root", "RECREATE");
@@ -63,7 +65,7 @@ int main()
 
 	for (int ibin = 0; ibin < nbins; ++ibin)
 	{
-		if (ibin == 0)
+	/*	if (ibin == 0)
 		{
 		//	pythia.readString("HardQCD:all = off");
 		//	pythia.readString("SoftQCD:nonDiffractive = on"); //find out why only non diffractive processes are used.
@@ -90,6 +92,7 @@ int main()
 			pythia.readString("WeakSingleBoson:all = off");
 			pythia.readString("WeakBosonAndParton:all = on"); //switching on high energy EW boson production
 		}
+		*/
 
 	
 		//setting limits on pthat for soft and hard qcd.
@@ -133,18 +136,19 @@ int main()
 					double eventNo = event_count;
 
 
-					cout<< "testing moms: OG particle: " <<event[i].id() <<"("<<event[i].index()<< ")" << ". mothers: " << event[event[i].mother1()].id()<<"("<< event[i].mother1()<<")" << " and "<< event[event[i].mother2()].id()<<"("<< event[i].mother2()<< ")"<< ". mothers of mothers: " << event[event[event[i].mother1()].mother1()].id()<<"("<< event[event[i].mother1()].mother1()<< ")" <<" and " << event[event[event[i].mother1()].mother2()].id()<<"("<< event[event[i].mother1()].mother2()<<")"<< endl;
+					//cout<< "testing moms: OG particle: " <<event[i].id() <<"("<<event[i].index()<< ")" << ". mothers: " << event[event[i].mother1()].id()<<"("<< event[i].mother1()<<")" << " and "<< event[event[i].mother2()].id()<<"("<< event[i].mother2()<< ")"<< ". mothers of mothers: " << event[event[event[i].mother1()].mother1()].id()<<"("<< event[event[i].mother1()].mother1()<< ")" <<" and " << event[event[event[i].mother1()].mother2()].id()<<"("<< event[event[i].mother1()].mother2()<<")"<< endl;
 
 					//cout <<"testing daughters: OG particle: " <<event[i].id() <<". daughter particles: "<< event[i].daughter1() <<" and "<< event[i].daughter2() << ". daughter particles: "<<event[event[i].daughter1()].daughter1() << " and " << event[event[i].daughter1()].daughter2() << endl;
 					
 					////man fuck this noise//////
-					if ((abs(particlemother1) == 13) && (abs(particlemother2 == 13)))
+					/*if ((abs(particlemother1) == 13) && (abs(particlemother2 == 13)))
 					{
 					cout << "newdaughterList: [";
 					std::cout << event[event[event[i].mother1()].daughter1()].id() << ", " << event[event[event[i].mother1()].daughter2()].id(); 
 					cout << "]" << endl;
 					cout << "momentum of daughter and mother:" << event[event[event[i].mother1()].daughter1()].pT() << " and pT_m1=" << event[event[i].mother1()].pT() << " and pT_d2=" << event[event[event[i].mother1()].daughter2()].pT() << endl;
 					}
+					*/
 
 					
 					//filling tuple bin entries
