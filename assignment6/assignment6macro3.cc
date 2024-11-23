@@ -11,7 +11,8 @@
 
 using namespace Pythia8;
 
-TCanvas *c3 = new TCanvas(); //canvas for rapidity pt distribution  
+TCanvas *c3 = new TCanvas(); //canvas for  pt distribution  
+TCanvas *c4 = new TCanvas(); //canvas for pt w+ to w- ratio  
 void assignment6macro3(){
 	//pthat bins
 
@@ -33,7 +34,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	
 	//total muon cross section with no cuts
 	TH1F* sub_TOTAL_NLO_muon_cross_section = new TH1F("sub_TOTAL_NLO_muon_cross_section", "", 50,0,100);
-	TH1F* TOTAL_NLO_muon_cross_section = new TH1F("TOTAL_NLO_muon_cross_section", "Trash total  muon differential cross section", 50,0,100);
+	TH1F* TOTAL_NLO_muon_cross_section = new TH1F("TOTAL_NLO_muon_cross_section", "muon differential cross section", 50,0,100);
 
 	//for pt distribution in central barrel
 	TH1F* sub_NLO_muon_cross_section_cb = new TH1F("sub_NLO_muon_cross_section_cb","", 100, 0, 100);
@@ -674,38 +675,38 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	TOTAL_NLO_muon_cross_section->GetXaxis()->SetTitle("pt (GeV/c)");
 
 	TOTAL_NLO_muon_cross_section->Draw("SAME");
-	c_NLO_muon_cross_section->Draw("SAME");
+//	c_NLO_muon_cross_section->Draw("SAME");
 	c_muon_cross_section ->Draw("SAME");
 	Z_NLO_muon_cross_section->Draw("SAME");
 	W_NLO_muon_cross_section->Draw("SAME");
 	//Wm_NLO_muon_cross_section->Draw("SAME");
 	//Wp_NLO_muon_cross_section->Draw("SAME");
-	b_NLO_muon_cross_section->Draw("SAME");
+//	b_NLO_muon_cross_section->Draw("SAME");
 	b_muon_cross_section ->Draw("SAME");
-	other_NLO_muon_cross_section->Draw("SAME");
-	other_muon_cross_section ->Draw("SAME");
-	muon_NLO_muon_cross_section->Draw("SAME");
+//	other_NLO_muon_cross_section->Draw("SAME");
+//	other_muon_cross_section ->Draw("SAME");
+//	muon_NLO_muon_cross_section->Draw("SAME");
 
 	TOTAL_NLO_muon_cross_section->SetLineColor(kBlack);
-	b_NLO_muon_cross_section->SetLineColor(kRed);
-	b_muon_cross_section->SetLineColor(46);
-	c_NLO_muon_cross_section->SetLineColor(kGreen);
-	c_muon_cross_section->SetLineColor(41);
+//	b_NLO_muon_cross_section->SetLineColor(kRed);
+	b_muon_cross_section->SetLineColor(kRed);
+//	c_NLO_muon_cross_section->SetLineColor(kGreen);
+	c_muon_cross_section->SetLineColor(kGreen);
 	W_NLO_muon_cross_section->SetLineColor(kBlue);
 	//Wm_NLO_muon_cross_section->SetLineColor(7);
 	//Wp_NLO_muon_cross_section->SetLineColor(8);
 	Z_NLO_muon_cross_section->SetLineColor(kYellow);
-	other_NLO_muon_cross_section->SetLineColor(kMagenta);
-	muon_NLO_muon_cross_section->SetLineColor(20);
+//	other_NLO_muon_cross_section->SetLineColor(kMagenta);
+//	muon_NLO_muon_cross_section->SetLineColor(20);
 
-	b_NLO_muon_cross_section->SetMarkerStyle(25);
-	b_NLO_muon_cross_section->SetMarkerColor(kRed);
-	b_muon_cross_section->SetMarkerStyle(46);
-	b_muon_cross_section->SetMarkerColor(46);
-	c_NLO_muon_cross_section->SetMarkerStyle(26);
-	c_NLO_muon_cross_section->SetMarkerColor(kGreen);
-	c_muon_cross_section->SetMarkerStyle(47);
-	c_muon_cross_section->SetMarkerColor(41);
+//	b_NLO_muon_cross_section->SetMarkerStyle(25);
+//	b_NLO_muon_cross_section->SetMarkerColor(kRed);
+	b_muon_cross_section->SetMarkerStyle(25);
+	b_muon_cross_section->SetMarkerColor(kRed);
+//	c_NLO_muon_cross_section->SetMarkerStyle(26);
+//	c_NLO_muon_cross_section->SetMarkerColor(kGreen);
+	c_muon_cross_section->SetMarkerStyle(26);
+	c_muon_cross_section->SetMarkerColor(kGreen);
 	W_NLO_muon_cross_section->SetMarkerStyle(28);
 	W_NLO_muon_cross_section->SetMarkerColor(kBlue);
 	Z_NLO_muon_cross_section->SetMarkerStyle(23);
@@ -716,28 +717,46 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	//Wm_NLO_muon_cross_section->SetMarkerColor(7);
 	//Wp_NLO_muon_cross_section->SetMarkerStyle(24);
 	//Wp_NLO_muon_cross_section->SetMarkerColor(8);
-	muon_NLO_muon_cross_section->SetMarkerStyle(39);
-	muon_NLO_muon_cross_section->SetMarkerColor(20);
+//	muon_NLO_muon_cross_section->SetMarkerStyle(39);
+//	muon_NLO_muon_cross_section->SetMarkerColor(20);
 
 
 
 	TLegend *leg2 = new TLegend(0.6, 0.7, 0.9, 0.9);
 	leg2->AddEntry(TOTAL_NLO_muon_cross_section,"Total", "lep");
-	leg2->AddEntry(b_NLO_muon_cross_section,"W/Z/#gamma*(probably) #rightarrow b #rightarrow #mu", "lep");
-	leg2->AddEntry(c_NLO_muon_cross_section,"W/Z/#gamma*(probably) #rightarrow c #rightarrow #mu", "lep");
+//	leg2->AddEntry(b_NLO_muon_cross_section,"W/Z/#gamma*(probably) #rightarrow b #rightarrow #mu", "lep");
+//	leg2->AddEntry(c_NLO_muon_cross_section,"W/Z/#gamma*(probably) #rightarrow c #rightarrow #mu", "lep");
 	leg2->AddEntry(b_muon_cross_section,"b #rightarrow #mu", "lep");
 	leg2->AddEntry(c_muon_cross_section,"c #rightarrow #mu", "lep");
 	leg2->AddEntry(Z_NLO_muon_cross_section, "Z/#gamma* #rightarrow #mu", "lep");
 	leg2->AddEntry(W_NLO_muon_cross_section, "W #rightarrow #mu", "lep");
 	//leg2->AddEntry(Wp_NLO_muon_cross_section, "W+ #rightarrow #mu", "lep");
 	//leg2->AddEntry(Wm_NLO_muon_cross_section, "W- #rightarrow #mu", "lep");
-	leg2->AddEntry(other_NLO_muon_cross_section,"other #rightarrow #mu", "lep");
-	leg2->AddEntry(muon_NLO_muon_cross_section,"#mu #rightarrow #mu + X", "lep");
+//	leg2->AddEntry(other_NLO_muon_cross_section,"other #rightarrow #mu", "lep");
+//	leg2->AddEntry(muon_NLO_muon_cross_section,"#mu #rightarrow #mu + X", "lep");
 	leg2->Draw("SAME");
 
 	TOTAL_NLO_muon_cross_section->SetMinimum(1);
 	TOTAL_NLO_muon_cross_section->SetMaximum(5000000000);
 	c3->Write();
+
+	//plotting ratio
+	c4->cd();
+	auto wpwm = new TRatioPlot(Wp_NLO_muon_cross_section,Wm_NLO_muon_cross_section);
+	
+	wpwm->Draw();
+	TLegend *leg3 = new TLegend(0.6, 0.7, 0.9, 0.9);  // Position it as needed
+
+	Wp_NLO_muon_cross_section->SetLineColor(kRed);    
+	Wm_NLO_muon_cross_section->SetLineColor(kBlue);    
+	wpwm->GetUpperRefYaxis()->SetTitle("d#sigma/dpt (pb/GeV/c)");
+	//wpwm->GetLowerRefYaxis()->SetTitle("(d#sigma^{W^+}/dpt)/(d#sigma^{W^-}/dpt)");
+	wpwm->GetLowerRefXaxis()->SetTitle("pT (GeV)");
+
+	leg3->AddEntry(Wm_NLO_muon_cross_section, "W-", "lep");
+	leg3->AddEntry(Wp_NLO_muon_cross_section, "W+", "lep");
+	wpwm->GetUpperPad()->cd();  // Make sure you're in the upper pad
+	leg3->Draw();
 
 
 	delete outFile;
