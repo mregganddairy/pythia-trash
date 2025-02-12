@@ -1,4 +1,5 @@
 Assignment 6 shows the differential cross section of weak processes when using POWHEG (NLO processes)
-macro1 considers the just the pt cross section of NLO
+macro1 considers just the pt cross section of NLO
 macro2 considers the pt cross section from both NLO and LO and compares the two
 macro3 adds the background processes to the NLO pt cross section
+macro4 adds the background processes to the NLO rapidity cross section

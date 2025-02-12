@@ -34,7 +34,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	
 	//total muon cross section with no cuts
 	TH1F* sub_TOTAL_NLO_muon_cross_section = new TH1F("sub_TOTAL_NLO_muon_cross_section", "", 50,0,100);
-	TH1F* TOTAL_NLO_muon_cross_section = new TH1F("TOTAL_NLO_muon_cross_section", "muon differential cross section", 50,0,100);
+	TH1F* TOTAL_NLO_muon_cross_section = new TH1F("TOTAL_NLO_muon_cross_section", "muon differential cross section (in forward region)", 50,0,100);
 
 	//for pt distribution in central barrel
 	TH1F* sub_NLO_muon_cross_section_cb = new TH1F("sub_NLO_muon_cross_section_cb","", 100, 0, 100);
@@ -149,6 +149,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 		for (int event_counter = 0; event_counter < particle_count; event_counter++)
 		{
 			muontuples->GetEntry(event_counter);
+			if ((eta > -4.0) && (eta < -2.5)){
 
 			sub_TOTAL_muon_cross_section->Fill(pt);
 
@@ -187,6 +188,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 		*/
 
 
+		}
 		}
 		
 		//normalising bins for calculating the cross section
@@ -256,7 +258,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	{
 		
 		muontuples->GetEntry(event_counter);
-	//if ((eta > -4.0) && (eta < -2.5)){
+	if ((eta > -4.0) && (eta < -2.5)){
 		
 		sub_TOTAL_NLO_muon_cross_section->Fill(pt);
 
@@ -317,7 +319,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 		{
 			sub_muon_NLO_muon_cross_section->Fill(pt);
 		}
-	//}
+	}
 	}
 	
 	//normalising bins for calculating the cross section
@@ -413,7 +415,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 
 		muontuples->GetEntry(event_counter);
 
-	//if ((eta > -4.0) && (eta < -2.5)){
+	if ((eta > -4.0) && (eta < -2.5)){
 
 		sub_TOTAL_NLO_muon_cross_section->Fill(pt);
 
@@ -477,7 +479,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 			cout << mother1 << "  " << mother2 << endl;
 			sub_muon_NLO_muon_cross_section->Fill(pt);
 		}
-	//}
+	}
 	}
 	
 	//normalising bins for calculating the cross section
@@ -568,7 +570,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 
 		muontuples->GetEntry(event_counter);
 		
-	//if ((eta > -4.0) && (eta < -2.5)){
+	if ((eta > -4.0) && (eta < -2.5)){
 		
 		sub_TOTAL_NLO_muon_cross_section->Fill(pt);
 
@@ -626,7 +628,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 		{
 			sub_muon_NLO_muon_cross_section->Fill(pt);
 		}
-	//}
+	}
 	}
 	
 	//normalising bins for calculating the cross section
@@ -736,8 +738,8 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 //	leg2->AddEntry(muon_NLO_muon_cross_section,"#mu #rightarrow #mu + X", "lep");
 	leg2->Draw("SAME");
 
-	TOTAL_NLO_muon_cross_section->SetMinimum(1);
-	TOTAL_NLO_muon_cross_section->SetMaximum(5000000000);
+	TOTAL_NLO_muon_cross_section->SetMinimum(0.1);
+	TOTAL_NLO_muon_cross_section->SetMaximum(2000000000);
 	c3->Write();
 
 	//plotting ratio
