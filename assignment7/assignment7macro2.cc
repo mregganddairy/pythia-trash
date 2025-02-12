@@ -345,52 +345,8 @@ static const double binedges[nbins+1] = {0., 150. };
 
 	sub_Wm_315000_muon_cross_section->Scale(scalebin, "width");
 	Wm_315000_muon_cross_section->Add(sub_Wm_315000_muon_cross_section);
-	}//315000
-	{
-	TFile* infile = TFile::Open("./output/wm_pwgevents_315000.root", "READ");
-	
-	vector<double> *Luminosity;
-	infile->GetObject("luminosity",Luminosity);
-
-
-	//resetting sub bins (bins from etahat) to fill main histogram
-	//reading files from pythia calculation
-	TNtuple *muontuples = (TNtuple*)infile->Get("muons");
-	Float_t type, eventNo,index, status, mother1, mother2, pAbs, pt, y, eta, id;	
-	int particle_count = muontuples->GetEntries();	//number of muons
-	muontuples->SetBranchAddress("eventNo", &eventNo);
-	muontuples->SetBranchAddress("index", &index);
-	muontuples->SetBranchAddress("mother1", &mother1);
-	muontuples->SetBranchAddress("mother2",&mother2);
-	muontuples->SetBranchAddress("pAbs", &pAbs);
-	muontuples->SetBranchAddress("pt", &pt);
-	muontuples->SetBranchAddress("y", &y);
-	muontuples->SetBranchAddress("eta", &eta);
-	muontuples->SetBranchAddress("id", &id);
-
-
-	//filling histograms
-	for (int event_counter = 0; event_counter < particle_count; event_counter++)
-	{
-		
-		muontuples->GetEntry(event_counter);
-	//if ((eta > -4.0) && (eta < -2.5)){
-		
-		if ((abs(mother1) == 24) || ((abs(mother1) == 13) && (abs(mother2) == 90)))
-		{
-			sub_Wm_315000_muon_cross_section->Fill(eta);
-		}
-
-
-	//}
 	}
-	
-	//normalising bins for calculating the cross section
-	double_t scalebin = 1./(*Luminosity)[0];
 
-	sub_Wm_315000_muon_cross_section->Scale(scalebin, "width");
-	Wm_315000_muon_cross_section->Add(sub_Wm_315000_muon_cross_section);
-	}
 
 	//315200
 	{
@@ -780,52 +736,8 @@ static const double binedges[nbins+1] = {0., 150. };
 
 	sub_Wp_315000_muon_cross_section->Scale(scalebin, "width");
 	Wp_315000_muon_cross_section->Add(sub_Wp_315000_muon_cross_section);
-	}//315000
-	{
-	TFile* infile = TFile::Open("./output/wp_pwgevents_315000.root", "READ");
-	
-	vector<double> *Luminosity;
-	infile->GetObject("luminosity",Luminosity);
-
-
-	//resetting sub bins (bins from etahat) to fill main histogram
-	//reading files from pythia calculation
-	TNtuple *muontuples = (TNtuple*)infile->Get("muons");
-	Float_t type, eventNo,index, status, mother1, mother2, pAbs, pt, y, eta, id;	
-	int particle_count = muontuples->GetEntries();	//number of muons
-	muontuples->SetBranchAddress("eventNo", &eventNo);
-	muontuples->SetBranchAddress("index", &index);
-	muontuples->SetBranchAddress("mother1", &mother1);
-	muontuples->SetBranchAddress("mother2",&mother2);
-	muontuples->SetBranchAddress("pAbs", &pAbs);
-	muontuples->SetBranchAddress("pt", &pt);
-	muontuples->SetBranchAddress("y", &y);
-	muontuples->SetBranchAddress("eta", &eta);
-	muontuples->SetBranchAddress("id", &id);
-
-
-	//filling histograms
-	for (int event_counter = 0; event_counter < particle_count; event_counter++)
-	{
-		
-		muontuples->GetEntry(event_counter);
-	//if ((eta > -4.0) && (eta < -2.5)){
-		
-		if ((abs(mother1) == 24) || ((abs(mother1) == 13) && (abs(mother2) == 90)))
-		{
-			sub_Wp_315000_muon_cross_section->Fill(eta);
-		}
-
-
-	//}
 	}
-	
-	//normalising bins for calculating the cross section
-	double_t scalebin = 1./(*Luminosity)[0];
 
-	sub_Wp_315000_muon_cross_section->Scale(scalebin, "width");
-	Wp_315000_muon_cross_section->Add(sub_Wp_315000_muon_cross_section);
-	}
 
 	//315200
 	{
@@ -1209,52 +1121,8 @@ static const double binedges[nbins+1] = {0., 150. };
 
 	sub_Z_315000_muon_cross_section->Scale(scalebin, "width");
 	Z_315000_muon_cross_section->Add(sub_Z_315000_muon_cross_section);
-	}//315000
-	{
-	TFile* infile = TFile::Open("./output/z_pwgevents_315000.root", "READ");
-	
-	vector<double> *Luminosity;
-	infile->GetObject("luminosity",Luminosity);
-
-
-	//resetting sub bins (bins from etahat) to fill main histogram
-	//reading files from pythia calculation
-	TNtuple *muontuples = (TNtuple*)infile->Get("muons");
-	Float_t type, eventNo,index, status, mother1, mother2, pAbs, pt, y, eta, id;	
-	int particle_count = muontuples->GetEntries();	//number of muons
-	muontuples->SetBranchAddress("eventNo", &eventNo);
-	muontuples->SetBranchAddress("index", &index);
-	muontuples->SetBranchAddress("mother1", &mother1);
-	muontuples->SetBranchAddress("mother2",&mother2);
-	muontuples->SetBranchAddress("pAbs", &pAbs);
-	muontuples->SetBranchAddress("pt", &pt);
-	muontuples->SetBranchAddress("y", &y);
-	muontuples->SetBranchAddress("eta", &eta);
-	muontuples->SetBranchAddress("id", &id);
-
-
-	//filling histograms
-	for (int event_counter = 0; event_counter < particle_count; event_counter++)
-	{
-		
-		muontuples->GetEntry(event_counter);
-	//if ((eta > -4.0) && (eta < -2.5)){
-		
-		if ((abs(mother1) == 24) || ((abs(mother1) == 13) && (abs(mother2) == 90)))
-		{
-			sub_Z_315000_muon_cross_section->Fill(eta);
-		}
-
-
-	//}
 	}
-	
-	//normalising bins for calculating the cross section
-	double_t scalebin = 1./(*Luminosity)[0];
 
-	sub_Z_315000_muon_cross_section->Scale(scalebin, "width");
-	Z_315000_muon_cross_section->Add(sub_Z_315000_muon_cross_section);
-	}
 
 	//315200
 	{
@@ -1467,7 +1335,7 @@ static const double binedges[nbins+1] = {0., 150. };
 	leg2->Draw("SAME");
 
 	Wm_10042_muon_cross_section->SetMinimum(1);
-	Wm_10042_muon_cross_section->SetMaximum(5000);
+	Wm_10042_muon_cross_section->SetMaximum(1750);
 	c3->Write();
 
 
@@ -1531,7 +1399,7 @@ static const double binedges[nbins+1] = {0., 150. };
 	leg->Draw("SAME");
 
 	Wp_10042_muon_cross_section->SetMinimum(1);
-	Wp_10042_muon_cross_section->SetMaximum(5000);
+	Wp_10042_muon_cross_section->SetMaximum(1800);
 	c4->Write();
 
 
@@ -1599,7 +1467,7 @@ static const double binedges[nbins+1] = {0., 150. };
 	leg3->Draw("SAME");
 
 	Z_10042_muon_cross_section->SetMinimum(1);
-	Z_10042_muon_cross_section->SetMaximum(5000);
+	Z_10042_muon_cross_section->SetMaximum(400);
 	c5->Write();
 
 	delete outFile;

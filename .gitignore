@@ -2,7 +2,9 @@
 
 *.log
 *.root
+*.pdf
 **/*.log
 **/*.root
 **/*.lhe
 **/*.out
+**/*.pdf

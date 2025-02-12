@@ -1,0 +1,8 @@
+This bad boy showers all the powheg lhe files and plots them all in rapidity and pt.
+
+assignment7.cc and assignment7.cmnd work together to shower POWHEG files. however they should be run using theshowerer.cc.
+bash theshowerer.sh to shower everything in rawPWHG
+root assignment7macro.cc to get the pt plots for all showered files
+root assignment7macro2.cc to get the rapidity plots for all showered files.
+plotPDFs.cc... plots PDFs for hessian type PDFs.
+plotPDFs_NNN.cc is the successful version plotPDFs_NN.cc and plots the pdfs for neural network type pdfs.
