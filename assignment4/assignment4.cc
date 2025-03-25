@@ -19,7 +19,7 @@ int main()
 	PythiaParallel pythia;
 
 	//creating ROOT file for histograms
-	TFile* outFile = new TFile("muonyield.root", "RECREATE");
+	TFile* outFile = new TFile("testmuonyield.root", "RECREATE");
 	TH1F* hard_muon_yield = new TH1F("hard_muon_yield","", 150, 0, 150);
 	TH1F* soft_muon_yield = new TH1F("soft_muon_yield","", 150, 0, 150);
 	TH1F* sum_hard_muon_yield = new TH1F("sum_hard_muon_yield","", 150, 0, 150);
@@ -27,7 +27,7 @@ int main()
 	TH1F* total_muon_yield = new TH1F("total_muon_yield","muon yield;pT;dN/pT", 150, 0, 150);
 
 	pythia.readString("Beams:eCM = 13600.");
-	pythia.readString("Parallelism:numThreads = 4");
+	pythia.readString("Parallelism:numThreads = 1");
 	
 	//defining bins to seperate soft and hard qcd using pthat
 	static const int nbins =6;
@@ -42,7 +42,7 @@ int main()
 	//muon number
 		}
 	
-	int nevents = 5000000;
+	int nevents = 5000;
 
 	for (int ibin = 0; ibin < nbins; ++ibin)
 	{

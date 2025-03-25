@@ -1,6 +1,7 @@
 #!/bin/bash
 
-PDFs=($(ls ./rawPWHG/))
+#PDFs=($(ls ./rawPWHG/))
+PDFs=("wm_pwgevents_14000.lhe")
 
 for PDF in "${PDFs[@]}"; do
 
@@ -9,12 +10,12 @@ for PDF in "${PDFs[@]}"; do
 
 	echo "showering $filename ..."
 	# changing the input files to look at the correct PDFs
-    sed -i "/TFile\* outFile = new TFile(\".*\", \"RECREATE\");/s/\"[^\"]*\"/\"${filename}.root\"/" assignment7.cc
+    sed -i "/TFile\* outFile = new TFile(\".*\", \"RECREATE\");/s/\"[^\"]*\"/\"${filename}.root\"/" assignment7_parallel.cc
 	sed -i "/^Beams:LHEF .*/s/=.*/=\.\/rawPWHG\/${filename}.lhe/" assignment7.cmnd
 
 	#actual showering
-	make assignment7
-	./assignment7 > assignment7${filename}.log
+	make assignment7_parallel
+	./assignment7_parallel > assignment7${filename}.log
 
 	#moving files
 	if [[ -f ${filename}.root && -f assignment7${filename}.log ]]; then

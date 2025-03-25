@@ -1,3 +1,4 @@
+*Slaps roof of code* 
 This bad boy showers all the powheg lhe files and plots them all in rapidity and pt.
 
 assignment7.cc and assignment7.cmnd work together to shower POWHEG files. however they should be run using theshowerer.cc.

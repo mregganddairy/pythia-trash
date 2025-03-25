@@ -1,3 +1,4 @@
+// Absolutely epic failed attempt at plotting NNPDFs. See plotPDFs_NNN.cc (written by chatGPT) for the functional version
 #include <LHAPDF/LHAPDF.h>
 #include <TCanvas.h>
 #include <TGraph.h>

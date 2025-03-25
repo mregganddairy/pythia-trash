@@ -9,14 +9,14 @@
 #include <cmath>
 
 int main() {
-	const std::string pdfSet = "CT18NNLO";
+	const std::string pdfSet = "CT18LO";
 	std::vector<LHAPDF::PDF*> pdfs = LHAPDF::mkPDFs(pdfSet); //0th member of the set
 	LHAPDF::PDF* pdf = LHAPDF::mkPDF(pdfSet,0);
 	
-	const double Q =10;
+	const double Q =1.3;
 	double Q2 =std::pow(Q, 2.0);
 	const int nPoints = 500;
-	const double xMin = 1e-4, xMax = 1.0;
+	const double xMin = 1e-6, xMax = 1.0;
 
 	//arrays for x and PDF values
 	double x[nPoints], gluon[nPoints], up[nPoints], down[nPoints], strange[nPoints], charm[nPoints], bottom[nPoints], aup[nPoints], adown[nPoints], astrange[nPoints], acharm[nPoints], abottom[nPoints];
@@ -37,7 +37,7 @@ int main() {
 	{
 
 		x[i] = xMin * std::pow(xMax / xMin, double(i) / (nPoints - 1));
-		gluon[i] = pdf->xfxQ2(21, x[i], Q2); //Gluon (ID 21)
+		gluon[i] = pdf->xfxQ2(21, x[i], Q2)/10; //Gluon (ID 21)
 		down[i] = pdf->xfxQ2(1, x[i], Q2); //Down (ID 1)
 		up[i] = pdf->xfxQ2(2, x[i], Q2); //Up (ID 2)
 		strange[i] = pdf->xfxQ2(3, x[i], Q2); //Strange (ID 3)
@@ -270,7 +270,7 @@ int main() {
 
     gUpUnc->GetXaxis()->SetTitle("x");
     gUpUnc->GetYaxis()->SetTitle("xf(x, Q^{2})");
-    gUpUnc->SetTitle((pdfSet+" at Q = 0.01 TeV").c_str());
+    gUpUnc->SetTitle((pdfSet+" at Q = 1.3 GeV").c_str());
 
     
     // Create a legend

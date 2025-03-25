@@ -11,3 +11,5 @@ Assignment4: using binning method to reach higher pt values and looking atthe co
 Assignment5: attempt at implementation of electroweak effects inorder to calculate contributions from W and Z to the muon distribution in LO using standalone pythia.
 
 Assignment6: Using POWHEG .lhe files to calculate contributions from W and Z to the muon distribution in NLO.
+
+Assignment7: Plots rapidity and pt distributions of W/Z for multiplle different pdfs and compares them. Additionally, it plots any PDFs of interest contained within LHAPDF.
