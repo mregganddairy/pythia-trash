@@ -9,11 +9,11 @@
 #include <cmath>
 
 int main() {
-	const std::string pdfSet = "CT18NNLO";
+	const std::string pdfSet = "MSHT20nnlo_as118";
 	std::vector<LHAPDF::PDF*> pdfs = LHAPDF::mkPDFs(pdfSet); //0th member of the set
 	LHAPDF::PDF* pdf = LHAPDF::mkPDF(pdfSet,0);
 	
-	const double Q =10;
+	const double Q =80.4;//units of GeV
 	double Q2 =std::pow(Q, 2.0);
 	const int nPoints = 500;
 	const double xMin = 1e-4, xMax = 1.0;
@@ -115,11 +115,11 @@ int main() {
 			Mabottom[i] = pdfs[j+1]->xfxQ2(-5, x[i], Q2); //anti-Bottom (ID 5)
 
 			//calculating asymmetric uncertainty
-
+/*
 			std::cout << "Pcharm[" << i << "] = " << Pcharm[i] << std::endl;
 			std::cout << "Mcharm[" << i << "] = " << Mcharm[i] << std::endl;
 			std::cout << "charm[" << i << "] = " << charm[i] << std::endl;
-			/*	std::cout << "test[" << i << "] = " << std::max(gluon[i] - Pgluon[i], gluon[i] - Mgluon[i]) << std::endl;
+				std::cout << "test[" << i << "] = " << std::max(gluon[i] - Pgluon[i], gluon[i] - Mgluon[i]) << std::endl;
 			*/
 			Pdeltag[i] += std::pow(std::max(std::max(Pgluon[i] - gluon[i], Mgluon[i] - gluon[i]), 0.0),2);
 			Mdeltag[i] += std::pow(std::max(std::max(gluon[i] - Pgluon[i], gluon[i] - Mgluon[i]), 0.0),2);
@@ -163,6 +163,9 @@ int main() {
 
 		Pdeltau[i] = std::sqrt(Pdeltau[i]);
 		Mdeltau[i] = std::sqrt(Mdeltau[i]);
+		
+		std::cout << "Pdeltag[" << i << "] = " << Pdeltag[i] << std::endl;
+		std::cout << "Mdeltag[" << i << "] = " << Mdeltag[i] << std::endl;
 
 		Pdeltad[i] = std::sqrt(Pdeltad[i]);
 		Mdeltad[i] = std::sqrt(Mdeltad[i]);
@@ -194,6 +197,209 @@ int main() {
 	}
 
 	// TGraph stuff
+	
+	TGraph* gPGluon= new TGraph(nPoints, x, Pdeltag);
+	TGraph* gMGluon= new TGraph(nPoints, x, Mdeltag);
+
+	TGraph* gPUp= new TGraph(nPoints, x, Pdeltau);
+	TGraph* gMUp= new TGraph(nPoints, x, Mdeltau);
+
+	TGraph* gPDown= new TGraph(nPoints, x, Pdeltad);
+	TGraph* gMDown= new TGraph(nPoints, x, Mdeltad);
+
+	TGraph* gPStrange= new TGraph(nPoints, x, Pdeltas);
+	TGraph* gMStrange= new TGraph(nPoints, x, Mdeltas);
+
+	TGraph* gPCharm= new TGraph(nPoints, x, Pdeltac);
+	TGraph* gMCharm= new TGraph(nPoints, x, Mdeltac);
+
+	TGraph* gPBottom= new TGraph(nPoints, x, Pdeltab);
+	TGraph* gMBottom= new TGraph(nPoints, x, Mdeltab);
+
+	TGraph* gPAUp= new TGraph(nPoints, x, Pdeltaau);
+	TGraph* gMAUp= new TGraph(nPoints, x, Mdeltaau);
+
+	TGraph* gPADown= new TGraph(nPoints, x, Pdeltaad);
+	TGraph* gMADown= new TGraph(nPoints, x, Mdeltaad);
+
+	//Setting position of lower and upperbounds on plots
+	
+	for (int i=0;i<nPoints;i++)
+	{
+	gPGluon->SetPoint(i,x[i],Pdeltag[i]/5 +gluon[i]/5);
+	gMGluon->SetPoint(i,x[i],-Mdeltag[i]/5 +gluon[i]/5);
+
+	gPUp->SetPoint(i,x[i],Pdeltau[i] +up[i]);
+	gMUp->SetPoint(i,x[i],-Mdeltau[i] +up[i]);
+
+	gPDown->SetPoint(i,x[i],Pdeltad[i] +down[i]);
+	gMDown->SetPoint(i,x[i],-Mdeltad[i] +down[i]);
+
+	gPStrange->SetPoint(i,x[i],Pdeltas[i] +strange[i]);
+	gMStrange->SetPoint(i,x[i],-Mdeltas[i] +strange[i]);
+
+	gPCharm->SetPoint(i,x[i],Pdeltac[i] +charm[i]);
+	gMCharm->SetPoint(i,x[i],-Mdeltac[i] +charm[i]);
+
+	gPBottom->SetPoint(i,x[i],Pdeltab[i] +bottom[i]);
+	gMBottom->SetPoint(i,x[i],-Mdeltab[i] +bottom[i]);
+
+	gPAUp->SetPoint(i,x[i],Pdeltaau[i] +aup[i]);
+	gMAUp->SetPoint(i,x[i],-Mdeltaau[i] +aup[i]);
+
+	gPADown->SetPoint(i,x[i],Pdeltaad[i] +adown[i]);
+	gMADown->SetPoint(i,x[i],-Mdeltaad[i] +adown[i]);
+
+	}
+
+	//Stuff for creating shading between lower and upper bounds
+	TGraph *gluonshade = new TGraph(2*nPoints);
+	TGraph *upshade = new TGraph(2*nPoints);
+	TGraph *downshade = new TGraph(2*nPoints);
+	TGraph *strangeshade = new TGraph(2*nPoints);
+	TGraph *charmshade = new TGraph(2*nPoints);
+	TGraph *bottomshade = new TGraph(2*nPoints);
+	TGraph *aupshade = new TGraph(2*nPoints);
+	TGraph *adownshade = new TGraph(2*nPoints);
+	for (int i=0;i<nPoints;i++)
+	{
+	gluonshade->SetPoint(i,x[i], Pdeltag[i]/5+gluon[i]/5);
+	gluonshade->SetPoint(nPoints+i,x[nPoints-i-1],-Mdeltag[nPoints-i-1]/5+gluon[nPoints-i-1]/5);
+
+	upshade->SetPoint(i,x[i],Pdeltau[i]+up[i]);
+	upshade->SetPoint(nPoints+i,x[nPoints-i-1],-Mdeltau[nPoints-i-1]+up[nPoints-i-1]);
+
+	downshade->SetPoint(i,x[i],Pdeltad[i]+down[i]);
+	downshade->SetPoint(nPoints+i,x[nPoints-i-1],-Mdeltad[nPoints-i-1]+down[nPoints-i-1]);
+
+	strangeshade->SetPoint(i,x[i],Pdeltas[i]+strange[i]);
+	strangeshade->SetPoint(nPoints+i,x[nPoints-i-1],-Mdeltas[nPoints-i-1]+strange[nPoints-i-1]);
+
+	charmshade->SetPoint(i,x[i],Pdeltac[i]+charm[i]);
+	charmshade->SetPoint(nPoints+i,x[nPoints-i-1],-Mdeltac[nPoints-i-1]+charm[nPoints-i-1]);
+
+	bottomshade->SetPoint(i,x[i],Pdeltab[i]+bottom[i]);
+	bottomshade->SetPoint(nPoints+i,x[nPoints-i-1],-Mdeltab[nPoints-i-1]+bottom[nPoints-i-1]);
+
+	aupshade->SetPoint(i,x[i],Pdeltaau[i]+aup[i]);
+	aupshade->SetPoint(nPoints+i,x[nPoints-i-1],-Mdeltaau[nPoints-i-1]+aup[nPoints-i-1]);
+
+	adownshade->SetPoint(i,x[i],Pdeltaad[i]+adown[i]);
+	adownshade->SetPoint(nPoints+i,x[nPoints-i-1],-Mdeltaad[nPoints-i-1]+adown[nPoints-i-1]);
+	}
+
+    TCanvas* c = new TCanvas("c", "PDFs", 800, 600);
+    c->SetLogx();
+    //c->SetLogy();
+
+	gPStrange->Draw("ALP");
+	gMStrange->Draw("L SAME");
+	gMStrange->SetLineStyle(9);
+	gPStrange->SetLineStyle(9);
+	gMStrange->SetLineColor(kGreen);
+	gPStrange->SetLineColor(kGreen);
+	strangeshade->SetFillStyle(3001);
+	strangeshade->SetFillColor(kGreen);
+	strangeshade->Draw("f");
+
+	gPStrange->SetMinimum(0);
+
+	gPCharm->Draw("L SAME");
+	gMCharm->Draw("L SAME");
+	gMCharm->SetLineStyle(9);
+	gPCharm->SetLineStyle(9);
+	gMCharm->SetLineColor(kCyan);
+	gPCharm->SetLineColor(kCyan);
+	charmshade->SetFillStyle(3001);
+	charmshade->SetFillColor(kCyan);
+	charmshade->Draw("f");
+
+	gPBottom->Draw("L SAME");
+	gMBottom->Draw("L SAME");
+	gMBottom->SetLineStyle(9);
+	gPBottom->SetLineStyle(9);
+	gMBottom->SetLineColor(kOrange);
+	gPBottom->SetLineColor(kOrange);
+	bottomshade->SetFillStyle(3001);
+	bottomshade->SetFillColor(kOrange);
+	bottomshade->Draw("f");
+
+
+	gPGluon->Draw("L SAME");
+	gMGluon->Draw("L SAME");
+	gMGluon->SetLineStyle(9);
+	gPGluon->SetLineStyle(9);
+	gMGluon->SetLineColor(kMagenta);
+	gPGluon->SetLineColor(kMagenta);
+	gluonshade->SetFillStyle(3001);
+	gluonshade->SetFillColor(kMagenta);
+	gluonshade->Draw("f");
+
+	gPUp->Draw("L SAME");
+	gMUp->Draw("L SAME");
+	gMUp->SetLineStyle(9);
+	gPUp->SetLineStyle(9);
+	gPUp->SetLineColor(kBlue);
+	gMUp->SetLineColor(kBlue);
+	upshade->SetFillStyle(3365);
+	upshade->SetFillColor(kBlue);
+	upshade->Draw("f");
+
+	gPDown->Draw("L SAME");
+	gMDown->Draw("L SAME");
+	gMDown->SetLineStyle(9);
+	gPDown->SetLineStyle(9);
+	gMDown->SetLineColor(kRed);
+	gPDown->SetLineColor(kRed);
+	downshade->SetFillStyle(3325);
+	downshade->SetFillColor(kRed);
+	downshade->Draw("f");
+
+
+	gPAUp->Draw("L SAME");
+	gMAUp->Draw("L SAME");
+	gMAUp->SetLineStyle(9);
+	gPAUp->SetLineStyle(9);
+	gPAUp->SetLineColor(kBlue);
+	gMAUp->SetLineColor(kBlue);
+	aupshade->SetFillStyle(3356);
+	aupshade->SetFillColor(kBlue);
+	aupshade->Draw("f");
+
+
+	gPADown->Draw("L SAME");
+	gMADown->Draw("L SAME");
+	gMADown->SetLineStyle(9);
+	gPADown->SetLineStyle(9);
+	gMADown->SetLineColor(kRed);
+	gPADown->SetLineColor(kRed);
+	adownshade->SetFillStyle(3352);
+	adownshade->SetFillColor(kRed);
+	adownshade->Draw("f");
+
+    gPStrange->GetXaxis()->SetTitle("x");
+    gPStrange->GetYaxis()->SetTitle("xf(x, Q^{2})");
+    gPStrange->SetTitle((pdfSet+" at Q = M_{W} ").c_str());
+    TLegend* legend = new TLegend(0.9, 0.55, 0.7, 0.9);
+
+    legend->AddEntry(gluonshade, "g/5", "f");
+    legend->AddEntry(upshade, "u", "f");
+    legend->AddEntry(downshade, "d", "f");
+    legend->AddEntry(strangeshade, "s", "f");
+    legend->AddEntry(charmshade, "c", "f");
+    legend->AddEntry(bottomshade, "b", "f");
+
+    legend->AddEntry(aupshade, "#bar{u}", "f");
+    legend->AddEntry(adownshade, "#bar{d}", "f");
+   /* legend->AddEntry(gAStrangeUnc, "#bar{s}", "f");
+    legend->AddEntry(gACharmUnc, "#bar{c}", "f");
+    legend->AddEntry(gABottomUnc, "#bar{b}", "f");
+	*/
+    legend->Draw();
+
+	
+	
+	/*
 	TGraphAsymmErrors* gGluonUnc = new TGraphAsymmErrors(nPoints, x, gluon, nullptr, nullptr, Mdeltag, Pdeltag);
 
 	TGraphAsymmErrors* gUpUnc = new TGraphAsymmErrors(nPoints, x, up, nullptr, nullptr, Mdeltau, Pdeltau);
@@ -270,7 +476,7 @@ int main() {
 
     gUpUnc->GetXaxis()->SetTitle("x");
     gUpUnc->GetYaxis()->SetTitle("xf(x, Q^{2})");
-    gUpUnc->SetTitle((pdfSet+" at Q = 0.01 TeV").c_str());
+    gUpUnc->SetTitle((pdfSet+" at Q = 80.3 GeV").c_str());
 
     
     // Create a legend
@@ -287,15 +493,14 @@ int main() {
     legend->AddEntry(gAStrangeUnc, "#bar{s}", "f");
     legend->AddEntry(gACharmUnc, "#bar{c}", "f");
     legend->AddEntry(gABottomUnc, "#bar{b}", "f");
-/*	
     legend->AddEntry(gAup, "#bar{u}", "l");
     legend->AddEntry(gAdown, "#bar{d}", "l");
     legend->AddEntry(gAstrange, "#bar{s}", "l");
     legend->AddEntry(gAcharm, "#bar{c}", "l");
     legend->AddEntry(gAbottom, "#bar{b}", "l");
-	*/
     legend->Draw();
 
+	*/
     // Save the plot
     c->SaveAs((pdfSet + "PDFs.pdf").c_str());
 
