@@ -77,6 +77,7 @@ int assignment7macro4()
 	TCanvas *c4 = new TCanvas(); //Canvas for ratio of W/Z
 	TCanvas *c5 = new TCanvas(); //Canvas for A asymmetry
 	TCanvas *c6 = new TCanvas(); //Canvas for all ratios
+	TCanvas *c7 = new TCanvas(); //Canvas for uncertaity ratios of all ratios
 
 	//plots with uncertainty
 	TGraphAsymmErrors* WpUnc = new TGraphAsymmErrors(nbins);
@@ -99,13 +100,18 @@ int assignment7macro4()
 	
 	//Ratios of calculated values and their uncertainties
 	TGraphErrors* R_pm = new TGraphErrors(nbins);
-	vector<double> W_pUnc(nbins, 0);
+	TGraph* R_pmUnc = new TGraph(nbins);
 
 	TGraphErrors* R_ZW = new TGraphErrors(nbins);
-	vector<double> W_mUnc(nbins, 0);
+	TGraph* R_ZWUnc = new TGraph(nbins);
 
 
 	TGraphErrors* A_pm = new TGraphErrors(nbins);
+	TGraph* A_pmUnc = new TGraph(nbins);
+
+	//Uncertainty vectors for boson cross sections
+	vector<double> W_pUnc(nbins, 0);
+	vector<double> W_mUnc(nbins, 0);
 	vector<double> Z_Unc(nbins, 0);
 
 
@@ -132,7 +138,7 @@ int assignment7macro4()
 		}
 
 		//processing central file
-		TString centralFilename = PDFID+"00_output/"+PDFID+"00_pythia_output/"+boson+"_pwgevents_"+PDFID+"00.root";
+		TString centralFilename = PDFID+"00_pythia_reweighted_output/"+PDFID+"00_pythia_output/"+boson+"_pwgevents_"+PDFID+"00.root";
 		TH1D* centralHist = new TH1D("centralHist", "Central Cross Section; #eta; d#sigma/d#eta", nbins, xlow, xhigh);
 		if (processFile(centralFilename.Data(), centralHist) < 0) {
 			std::cerr << "Error processing central file." << std::endl;
@@ -144,7 +150,7 @@ int assignment7macro4()
 		for (int i = 1; i <= numVariations; ++i) {
 			//getting names of files for each pdf 
 			std::ostringstream oss;
-			oss << PDFID+"00_output/" << PDFID << "00_pythia_output/" << boson << "_pwgevents_" << PDFID << (i < 10 ? "0" : "") << i << ".root";
+			oss << PDFID+"00_pythia_reweighted_output/" << PDFID << "00_pythia_output/" << boson << "_pwgevents_" << PDFID << (i < 10 ? "0" : "") << i << ".root";
 			std::string varFilename = oss.str();
 			
 			//create a histogram for this variation (clone the binning of centralHist)
@@ -240,7 +246,7 @@ int assignment7macro4()
 		{
 			
 			WmUnc->SetTitle(" ");
-			WmUnc->SetMarkerStyle(45);
+			WmUnc->SetMarkerStyle(73);
 			WmUnc->SetMarkerColor(kRed);
 			WmUnc->SetLineColor(kRed);
 			WmUnc->SetMarkerSize(0.8);
@@ -253,7 +259,7 @@ int assignment7macro4()
 		else if (k==1)
 		{
 
-			WpUnc->SetMarkerStyle(44);
+			WpUnc->SetMarkerStyle(72);
 			WpUnc->SetMarkerColor(kBlue);
 			WpUnc->SetLineColor(kBlue);
 			WpUnc->SetMarkerSize(0.8);
@@ -263,7 +269,7 @@ int assignment7macro4()
 		else if (k==2)
 		{
 
-			ZUnc->SetMarkerStyle(43);
+			ZUnc->SetMarkerStyle(71);
 			ZUnc->SetMarkerColor(kMagenta);
 			ZUnc->SetLineColor(kMagenta);
 			ZUnc->SetMarkerSize(0.7);
@@ -279,18 +285,20 @@ int assignment7macro4()
 		if (k==0)
 		{
 			SymmWmUncRat->SetTitle(" ");
-			SymmWmUncRat->SetMarkerStyle(45);
+			SymmWmUncRat->SetMarkerStyle(73);
 			SymmWmUncRat->SetMarkerColor(kRed);
 			SymmWmUncRat->SetLineColor(kRed);
 			SymmWmUncRat->Draw("AP");
 			SymmWmUncRat->GetYaxis()->SetTitle("Percentage Uncertainty (%)");
 			SymmWmUncRat->GetXaxis()->SetTitle("y");
+			SymmWmUncRat->SetMaximum(10);
+			SymmWmUncRat->SetMinimum(0);
 			leg2->AddEntry(SymmWmUncRat, "#mu #leftarrow W^{-}", "lep");
 
 		}
 		else if (k==1)
 		{
-			SymmWpUncRat->SetMarkerStyle(44);
+			SymmWpUncRat->SetMarkerStyle(72);
 			SymmWpUncRat->SetMarkerColor(kBlue);
 			SymmWpUncRat->SetLineColor(kBlue);
 			SymmWpUncRat->Draw("P SAME");
@@ -299,7 +307,7 @@ int assignment7macro4()
 		}
 		else if (k==2)
 		{
-			SymmZUncRat->SetMarkerStyle(43);
+			SymmZUncRat->SetMarkerStyle(71);
 			SymmZUncRat->SetMarkerColor(kMagenta);
 			SymmZUncRat->SetLineColor(kMagenta);
 			SymmZUncRat->Draw("P SAME");
@@ -313,7 +321,7 @@ int assignment7macro4()
 		for (auto h : variationHists){delete h;}
 	}
 
-	//Now calculating and setting values for ratios
+	//Now calculating and setting values for ratios and uncertainty percentages of uncertainties
 	
 	for (int bin = 1; bin <= nbins; bin++) 
 	{
@@ -327,72 +335,124 @@ int assignment7macro4()
 	double Z_x = ZUnc->GetPointX(bin-1);
 	double Z_y = ZUnc->GetPointY(bin-1);
 
-	R_pm->SetPoint(bin-1, Wm_x, Wp_y/Wm_y);
-	R_pm->SetPointError(bin-1, 0, std::sqrt(std::pow(Wp_y/Wm_y, 2)*(std::pow(W_mUnc[bin-1]/Wm_y,2) + std::pow(W_pUnc[bin-1]/Wp_y,2))));
+	double R_pm_value = Wp_y/Wm_y;
+	double R_pm_uncertainty = std::sqrt(std::pow(Wp_y/Wm_y, 2)*(std::pow(W_mUnc[bin-1]/Wm_y,2) + std::pow(W_pUnc[bin-1]/Wp_y,2)));
 
-	A_pm->SetPoint(bin-1, Wm_x, ((Wp_y-Wm_y)/(Wp_y + Wm_x)));
-	A_pm->SetPointError(bin-1, 0, std::sqrt(std::pow((Wp_y-Wm_y)/(Wm_y + Wp_y), 2)*(std::pow((std::pow(W_mUnc[bin-1],2)+std::pow(W_pUnc[bin-1],2))/(Wp_y-Wm_y),2) + (std::pow((std::pow(W_mUnc[bin-1],2)+std::pow(W_pUnc[bin-1],2))/(Wp_y+Wm_y),2)))));
+	double A_pm_value = ((Wp_y-Wm_y)/(Wp_y + Wm_y));
+	double A_pm_uncertainty = std::sqrt(std::pow(((1.0-A_pm_value)/(Wp_y+Wm_y))*W_pUnc[bin-1],2) + std::pow(((1.0+A_pm_value)/(Wp_y+Wm_y))*W_mUnc[bin-1],2));
+
+	double R_ZW_value = ((Z_y)/(Wp_y + Wm_y));
+	double R_ZW_uncertainty = std::sqrt(std::pow(R_ZW_value,2)*((std::pow(W_pUnc[bin-1],2) +std::pow(W_mUnc[bin-1],2))/std::pow(Wp_y+Wm_y,2) + std::pow(Z_Unc[bin-1]/Z_y, 2)));
+
+	R_pm->SetPoint(bin-1, Wm_x, R_pm_value);
+	R_pm->SetPointError(bin-1, 0, R_pm_uncertainty);
+
+	A_pm->SetPoint(bin-1, Wm_x, A_pm_value);
+	A_pm->SetPointError(bin-1, 0, A_pm_uncertainty);
 
 	
-	R_ZW->SetPoint(bin-1, Wm_x, ((Z_y)/(Wp_y + Wm_x)));
-	R_ZW->SetPointError(bin-1, 0, std::sqrt(std::pow((Z_y)/(Wm_y+Wp_y), 2)*((std::pow(Z_Unc[bin-1]/Z_y,2)) + (std::pow((std::pow(W_mUnc[bin-1],2)+std::pow(W_pUnc[bin-1],2))/(Wp_y+Wm_y),2)))));
+	R_ZW->SetPoint(bin-1, Wm_x, R_ZW_value);
+	R_ZW->SetPointError(bin-1, 0, R_ZW_uncertainty);
+
+	//Now calculating and setting values for ratios and uncertainty percentages of uncertainties
+	
+	R_pmUnc->SetPoint(bin-1, Wm_x, 100*((std::abs(R_pm_uncertainty)/std::abs(R_pm_value))));
+	A_pmUnc->SetPoint(bin-1, Wm_x, 100*((std::abs(A_pm_uncertainty)/std::abs(A_pm_value))));
+	R_ZWUnc->SetPoint(bin-1, Wm_x, 100*((std::abs(R_ZW_uncertainty)/std::abs(R_ZW_value))));
+	
+	std::cout << "Wplus:	 " << bin <<  WpUnc->GetPointY(bin-1) << std::endl;
+	std::cout << "Wminus:	 " << bin << WmUnc->GetPointY(bin-1) << std::endl;
+	std::cout << "Z:		 " << bin << ZUnc->GetPointY(bin-1) << std::endl;
 
 	}
 	
+	//Plotting ratios on separate graphs
+	
 	c3->cd(); //plotting R_pm
 	R_pm->SetTitle(" ");
-	R_pm->SetMarkerStyle(45);
-	R_pm->SetMarkerColor(kRed);
-	R_pm->SetLineColor(kRed);
+	R_pm->SetMarkerStyle(23);
+	R_pm->SetMarkerColor(kOrange);
+	R_pm->SetLineColor(kOrange);
 	R_pm->Draw("AP");
 	R_pm->GetYaxis()->SetTitle("R_{#pm}");
 	R_pm->GetXaxis()->SetTitle("y");
 
 	c4->cd(); //plotting A_pm
 	A_pm->SetTitle(" ");
-	A_pm->SetMarkerStyle(44);
-	A_pm->SetMarkerColor(kBlue);
-	A_pm->SetLineColor(kBlue);
+	A_pm->SetMarkerStyle(28);
+	A_pm->SetMarkerColor(kAzure);
+	A_pm->SetLineColor(kAzure);
 	A_pm->Draw("AP");
 	A_pm->GetYaxis()->SetTitle("A_{#pm}");
 	A_pm->GetXaxis()->SetTitle("y");
 
 	c5->cd(); //plotting R_Z/W
 	R_ZW->SetTitle(" ");
-	R_ZW->SetMarkerStyle(43);
-	R_ZW->SetMarkerColor(kMagenta);
-	R_ZW->SetLineColor(kMagenta);
+	R_ZW->SetMarkerStyle(47);
+	R_ZW->SetMarkerColor(kViolet);
+	R_ZW->SetLineColor(kViolet);
 	R_ZW->Draw("AP");
 	R_ZW->GetYaxis()->SetTitle("R_{Z/W}");
 	R_ZW->GetXaxis()->SetTitle("y");
 
-	c3->Write();
-	c4->Write();
-	c5->Write();
 
-
-	TGraphAsymmErrors* pain = new TGraphAsymmErrors(1);
-	c6->cd(); //Plotting all ratios
+	//Plotting all ratios
+	c6->cd(); 
 			  
-	pain->SetMaximum(1.7);
-	pain->SetMinimum(-1.7);
-	pain->GetYaxis()->SetTitle("Ratio");
-	pain->GetXaxis()->SetTitle("y");
-	pain->Draw("AP");
+	TGraphErrors* R_ZW_2 = (TGraphErrors*)R_ZW->Clone("R_ZW_2");
 
-	R_ZW->Draw("P SAME");
-	leg4->AddEntry(R_ZW, "R_{Z/W}", "lep");
+	R_ZW_2->SetMarkerStyle(47);
+	R_ZW_2->SetMarkerColor(kViolet);
+	R_ZW_2->SetLineColor(kViolet);
+	R_ZW_2->SetMaximum(1.7);
+	R_ZW_2->SetMinimum(-1.7);
+	R_ZW_2->GetYaxis()->SetTitle("Ratio");
+	R_ZW_2->GetXaxis()->SetTitle("y");
+	R_ZW_2->Draw("AP");
+
+	leg4->AddEntry(R_ZW_2, "R_{Z/W}", "lep");
 	R_pm->Draw("P SAME");
 	leg4->AddEntry(R_pm, "R_{#pm}", "lep");
 	A_pm->Draw("P SAME");
 	leg4->AddEntry(A_pm, "A_{#pm}", "lep");
 	leg4->Draw();
 	
+	//plotting uncertaintyi ratios
+	c7->cd();
+
+	R_ZWUnc->SetTitle("  ");
+	R_ZWUnc->SetMarkerStyle(47);
+	R_ZWUnc->SetMarkerColor(kViolet);
+	R_ZWUnc->SetMinimum(0);
+	R_ZWUnc->SetMaximum(40);
+	R_ZWUnc->SetLineColor(kViolet);
+	R_ZWUnc->GetYaxis()->SetTitle("Uncerainty Percentage (%)");
+	R_ZWUnc->GetXaxis()->SetTitle("y");
+	R_ZWUnc->Draw("AP");
+	leg5->AddEntry(R_ZWUnc, "R_{Z/W}", "lep");
+
+	R_pmUnc->SetMarkerStyle(23);
+	R_pmUnc->SetMarkerColor(kOrange);
+	R_pmUnc->SetLineColor(kOrange);
+	R_pmUnc->Draw("P SAME");
+	leg5->AddEntry(R_pmUnc, "R_{#pm}", "lep");
+
+
+	A_pmUnc->SetMarkerStyle(28);
+	A_pmUnc->SetMarkerColor(kAzure);
+	A_pmUnc->SetLineColor(kAzure);
+	A_pmUnc->Draw("P SAME");
+	leg5->AddEntry(A_pmUnc, "A_{#pm}", "lep");
+	leg5->Draw();
 
 	TFile* outFile =new TFile("NLOMuonEtaDistMacro.root", "RECREATE");
 	c1->Write();
 	c2->Write();
+	c3->Write();
+	c4->Write();
+	c5->Write();
 	c6->Write();
+	c7->Write();
 	outFile->Close();
 	delete outFile;
 

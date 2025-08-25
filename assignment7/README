@@ -5,7 +5,7 @@ assignment7.cc and assignment7.cmnd work together to shower POWHEG files. howeve
 bash theshowerer.sh to shower everything in rawPWHG
 root assignment7macro.cc to get the pt plots for all showered files
 root assignment7macro2.cc to get the rapidity plots for all showered files.
-root assignment7macro3.cc to compare diffferent pdfs...
+root assignment7macro3.cc to compare different pdfs...
 root assignment7macro4.cc to produce differential cross section for y incorporating pdfs' corresponding uncertainty. Also produces uncertainty percentage plots and the ratios of the electroweak bosons. 
 
 plotPDFs.cc... plots PDFs for hessian type PDFs.

@@ -34,7 +34,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	
 	//total muon cross section with no cuts
 	TH1F* sub_TOTAL_NLO_muon_cross_section = new TH1F("sub_TOTAL_NLO_muon_cross_section", "", 50,0,100);
-	TH1F* TOTAL_NLO_muon_cross_section = new TH1F("TOTAL_NLO_muon_cross_section", "muon differential cross section (in forward region)", 50,0,100);
+	TH1F* TOTAL_NLO_muon_cross_section = new TH1F("TOTAL_NLO_muon_cross_section", "muon differential cross section (-4.0<y<-2.5)", 50,0,100);
 
 	//for pt distribution in central barrel
 	TH1F* sub_NLO_muon_cross_section_cb = new TH1F("sub_NLO_muon_cross_section_cb","", 100, 0, 100);
@@ -217,7 +217,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 //*******************************************************************************
 	
 	{
-	TFile* infile = TFile::Open("wp_NLOmuonyield.root", "READ");
+	TFile* infile = TFile::Open("/home/Josh/physics/pythia/assignment7/27400_output/27400_pythia_output/wp_pwgevents_27400.root", "READ");
 	
 	vector<double> *Luminosity;
 	infile->GetObject("luminosity",Luminosity);
@@ -260,7 +260,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 		muontuples->GetEntry(event_counter);
 	if ((eta > -4.0) && (eta < -2.5)){
 		
-		sub_TOTAL_NLO_muon_cross_section->Fill(pt);
+		//sub_TOTAL_NLO_muon_cross_section->Fill(pt);
 
 		//check if muon is in a particular region for region plots
 		if (abs(eta) < 0.9)
@@ -325,7 +325,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	//normalising bins for calculating the cross section
 	double_t scalebin = 1./(*Luminosity)[0];
 
-	sub_TOTAL_NLO_muon_cross_section->Scale(scalebin, "width");
+	//sub_TOTAL_NLO_muon_cross_section->Scale(scalebin, "width");
 	sub_NLO_muon_cross_section_cb->Scale(scalebin, "width");
 	sub_NLO_muon_cross_section_fr->Scale(scalebin, "width");
 	sub_b_NLO_muon_cross_section->Scale(scalebin, "width");
@@ -338,7 +338,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	sub_muon_NLO_muon_cross_section->Scale(scalebin, "width");
 	
 
-	TOTAL_NLO_muon_cross_section->Add(sub_TOTAL_NLO_muon_cross_section);
+	//TOTAL_NLO_muon_cross_section->Add(sub_TOTAL_NLO_muon_cross_section);
 	total_NLO_muon_cross_section_cb->Add(sub_NLO_muon_cross_section_cb);
 	total_NLO_muon_cross_section_fr->Add(sub_NLO_muon_cross_section_fr);
 	b_NLO_muon_cross_section->Add(sub_b_NLO_muon_cross_section);
@@ -373,7 +373,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 
 	sub_NLO_muon_cross_section_cb->Reset();
 	sub_NLO_muon_cross_section_fr->Reset();
-	TFile* infile = TFile::Open("wm_NLOmuonyield.root", "READ");
+	TFile* infile = TFile::Open("/home/Josh/physics/pythia/assignment7/27400_output/27400_pythia_output/wm_pwgevents_27400.root", "READ");
 	
 	vector<double> *Luminosity;
 	infile->GetObject("luminosity",Luminosity);
@@ -417,7 +417,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 
 	if ((eta > -4.0) && (eta < -2.5)){
 
-		sub_TOTAL_NLO_muon_cross_section->Fill(pt);
+		//sub_TOTAL_NLO_muon_cross_section->Fill(pt);
 
 		//check if muon is in a particular region for region plots
 		if (abs(eta) < 0.9)
@@ -485,7 +485,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	//normalising bins for calculating the cross section
 	double_t scalebin = 1./(*Luminosity)[0];
 
-	sub_TOTAL_NLO_muon_cross_section->Scale(scalebin, "width");
+	//sub_TOTAL_NLO_muon_cross_section->Scale(scalebin, "width");
 	sub_NLO_muon_cross_section_cb->Scale(scalebin, "width");
 	sub_NLO_muon_cross_section_fr->Scale(scalebin, "width");
 	sub_b_NLO_muon_cross_section->Scale(scalebin, "width");
@@ -498,7 +498,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	sub_muon_NLO_muon_cross_section->Scale(scalebin, "width");
 	
 
-	TOTAL_NLO_muon_cross_section->Add(sub_TOTAL_NLO_muon_cross_section);
+	//TOTAL_NLO_muon_cross_section->Add(sub_TOTAL_NLO_muon_cross_section);
 	total_NLO_muon_cross_section_cb->Add(sub_NLO_muon_cross_section_cb);
 	total_NLO_muon_cross_section_fr->Add(sub_NLO_muon_cross_section_fr);
 	b_NLO_muon_cross_section->Add(sub_b_NLO_muon_cross_section);
@@ -528,7 +528,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 
 	sub_NLO_muon_cross_section_cb->Reset();
 	sub_NLO_muon_cross_section_fr->Reset();
-	TFile* infile = TFile::Open("Z_NLOmuonyield.root", "READ");
+	TFile* infile = TFile::Open("/home/Josh/physics/pythia/assignment7/27400_output/27400_pythia_output/z_pwgevents_27400.root", "READ");
 	
 	vector<double> *Luminosity;
 	infile->GetObject("luminosity",Luminosity);
@@ -572,7 +572,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 		
 	if ((eta > -4.0) && (eta < -2.5)){
 		
-		sub_TOTAL_NLO_muon_cross_section->Fill(pt);
+		//sub_TOTAL_NLO_muon_cross_section->Fill(pt);
 
 		//check if muon is in a particular region for region plots
 		if (abs(eta) < 0.9)
@@ -634,7 +634,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	//normalising bins for calculating the cross section
 	double_t scalebin = 1./(*Luminosity)[0];
 
-	sub_TOTAL_NLO_muon_cross_section->Scale(scalebin, "width");
+	//sub_TOTAL_NLO_muon_cross_section->Scale(scalebin, "width");
 	sub_NLO_muon_cross_section_cb->Scale(scalebin, "width");
 	sub_NLO_muon_cross_section_fr->Scale(scalebin, "width");
 	sub_b_NLO_muon_cross_section->Scale(scalebin, "width");
@@ -647,7 +647,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	sub_muon_NLO_muon_cross_section->Scale(scalebin, "width");
 	
 
-	TOTAL_NLO_muon_cross_section->Add(sub_TOTAL_NLO_muon_cross_section);
+	//TOTAL_NLO_muon_cross_section->Add(sub_TOTAL_NLO_muon_cross_section);
 	total_NLO_muon_cross_section_cb->Add(sub_NLO_muon_cross_section_cb);
 	total_NLO_muon_cross_section_fr->Add(sub_NLO_muon_cross_section_fr);
 	b_NLO_muon_cross_section->Add(sub_b_NLO_muon_cross_section);
@@ -673,18 +673,18 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	c3->SetLogy();
 	c3->SetGridy();
 
-	TOTAL_NLO_muon_cross_section->GetYaxis()->SetTitle("d#sigma/dpt (pb/GeV/c)");
-	TOTAL_NLO_muon_cross_section->GetXaxis()->SetTitle("pt (GeV/c)");
+	TOTAL_NLO_muon_cross_section->GetYaxis()->SetTitle("d#sigma/dp_{T} (pb/GeV/c)");
+	TOTAL_NLO_muon_cross_section->GetXaxis()->SetTitle("p_{T} (GeV/c)");
 
 	TOTAL_NLO_muon_cross_section->Draw("SAME");
 //	c_NLO_muon_cross_section->Draw("SAME");
-	c_muon_cross_section ->Draw("SAME");
+	//c_muon_cross_section ->Draw("SAME");
 	Z_NLO_muon_cross_section->Draw("SAME");
 	W_NLO_muon_cross_section->Draw("SAME");
 	//Wm_NLO_muon_cross_section->Draw("SAME");
 	//Wp_NLO_muon_cross_section->Draw("SAME");
 //	b_NLO_muon_cross_section->Draw("SAME");
-	b_muon_cross_section ->Draw("SAME");
+	//b_muon_cross_section ->Draw("SAME");
 //	other_NLO_muon_cross_section->Draw("SAME");
 //	other_muon_cross_section ->Draw("SAME");
 //	muon_NLO_muon_cross_section->Draw("SAME");
@@ -697,7 +697,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	W_NLO_muon_cross_section->SetLineColor(kBlue);
 	//Wm_NLO_muon_cross_section->SetLineColor(7);
 	//Wp_NLO_muon_cross_section->SetLineColor(8);
-	Z_NLO_muon_cross_section->SetLineColor(kYellow);
+	Z_NLO_muon_cross_section->SetLineColor(kRed);
 //	other_NLO_muon_cross_section->SetLineColor(kMagenta);
 //	muon_NLO_muon_cross_section->SetLineColor(20);
 
@@ -712,7 +712,7 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 	W_NLO_muon_cross_section->SetMarkerStyle(28);
 	W_NLO_muon_cross_section->SetMarkerColor(kBlue);
 	Z_NLO_muon_cross_section->SetMarkerStyle(23);
-	Z_NLO_muon_cross_section->SetMarkerColor(kYellow);
+	Z_NLO_muon_cross_section->SetMarkerColor(kRed);
 	TOTAL_NLO_muon_cross_section->SetMarkerStyle(29);
 	TOTAL_NLO_muon_cross_section->SetMarkerColor(kBlack);
 	//Wm_NLO_muon_cross_section->SetMarkerStyle(20);
@@ -725,13 +725,13 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 
 
 	TLegend *leg2 = new TLegend(0.6, 0.7, 0.9, 0.9);
-	leg2->AddEntry(TOTAL_NLO_muon_cross_section,"Total", "lep");
 //	leg2->AddEntry(b_NLO_muon_cross_section,"W/Z/#gamma*(probably) #rightarrow b #rightarrow #mu", "lep");
 //	leg2->AddEntry(c_NLO_muon_cross_section,"W/Z/#gamma*(probably) #rightarrow c #rightarrow #mu", "lep");
-	leg2->AddEntry(b_muon_cross_section,"b #rightarrow #mu", "lep");
-	leg2->AddEntry(c_muon_cross_section,"c #rightarrow #mu", "lep");
-	leg2->AddEntry(Z_NLO_muon_cross_section, "Z/#gamma* #rightarrow #mu", "lep");
-	leg2->AddEntry(W_NLO_muon_cross_section, "W #rightarrow #mu", "lep");
+	leg2->AddEntry(W_NLO_muon_cross_section, "#mu #leftarrow W", "lep");
+	leg2->AddEntry(Z_NLO_muon_cross_section, "#mu #leftarrow Z/#gamma*", "lep");
+	leg2->AddEntry(TOTAL_NLO_muon_cross_section,"Background", "lep");
+//	leg2->AddEntry(b_muon_cross_section,"#mu #leftarrow b", "lep");
+//	leg2->AddEntry(c_muon_cross_section,"#mu #leftarrow c", "lep");
 	//leg2->AddEntry(Wp_NLO_muon_cross_section, "W+ #rightarrow #mu", "lep");
 	//leg2->AddEntry(Wm_NLO_muon_cross_section, "W- #rightarrow #mu", "lep");
 //	leg2->AddEntry(other_NLO_muon_cross_section,"other #rightarrow #mu", "lep");
@@ -744,21 +744,29 @@ static const int c_moms[] = {411, 421, 10411, 10421, 413, 423, 10413, 10423, 204
 
 	//plotting ratio
 	c4->cd();
+	Wp_NLO_muon_cross_section->GetXaxis()->SetTitle("p_{T} (GeV/c)");
 	auto wpwm = new TRatioPlot(Wp_NLO_muon_cross_section,Wm_NLO_muon_cross_section);
+								
 	
 	wpwm->Draw();
+	wpwm->GetUpperPad()->cd();  // Make sure you're in the upper pad
+	Wp_NLO_muon_cross_section->Draw("SAME");
+	Wm_NLO_muon_cross_section->Draw("HIST SAME");
 	TLegend *leg3 = new TLegend(0.6, 0.7, 0.9, 0.9);  // Position it as needed
 
 	Wp_NLO_muon_cross_section->SetLineColor(kRed);    
+	Wp_NLO_muon_cross_section->SetMarkerStyle(25);
+	Wp_NLO_muon_cross_section->SetMarkerColor(kRed);
 	Wm_NLO_muon_cross_section->SetLineColor(kBlue);    
-	wpwm->GetUpperRefYaxis()->SetTitle("d#sigma/dpt (pb/GeV/c)");
+	Wm_NLO_muon_cross_section->SetMarkerStyle(26);
+	Wm_NLO_muon_cross_section->SetMarkerColor(kBlue);
+	wpwm->GetUpperRefYaxis()->SetTitle("d#sigma/dp_{T} (pb/GeV/c)");
 	//wpwm->GetLowerRefYaxis()->SetTitle("(d#sigma^{W^+}/dpt)/(d#sigma^{W^-}/dpt)");
-	wpwm->GetLowerRefXaxis()->SetTitle("pT (GeV)");
-
-	leg3->AddEntry(Wm_NLO_muon_cross_section, "W-", "lep");
-	leg3->AddEntry(Wp_NLO_muon_cross_section, "W+", "lep");
-	wpwm->GetUpperPad()->cd();  // Make sure you're in the upper pad
+	leg3->AddEntry(Wm_NLO_muon_cross_section, "#mu #leftarrow W^{-}", "lep");
+	leg3->AddEntry(Wp_NLO_muon_cross_section, "#mu #leftarrow W^{+}", "lep");
 	leg3->Draw();
+
+
 
 
 	delete outFile;

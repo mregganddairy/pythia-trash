@@ -19,8 +19,7 @@ PATH=$PATH:/home/brwjos004/physics/lhapdf/bin
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/home/brwjos004/physics/pythia8312/lib
 
 
-#for boson in wp wm z; do
-for boson in wm z; do
+for boson in wp wm z; do
 
 	#enter file of corresponding boson
 	if [[ "$boson" == "wp" || "$boson" == "wm" ]];then

@@ -18,7 +18,7 @@ Init:showChangedParticleData = off
 
 ! Input file.
 Beams:frameType = 4
-Beams:LHEF =./rawPWHG/wm_pwgevents_14000.lhe
+Beams:LHEF =/home/Josh/physics/pythia/scripts_from_HPC/testOutput.out
 
 ! Number of outgoing particles of POWHEG Born level process
 ! (i.e. not counting additional POWHEG radiation)

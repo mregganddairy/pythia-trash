@@ -1,0 +1,14 @@
+NB!!!!!!
+when making edits to powheg.input, keep in mind that adding
+lines prior to compute_rwght 1 will probably break things
+and changes need to be made to reweighting_powheg.sh.
+
+Reoganiser.cpp rewrites the .lhe file to place the relevant weights in the location where pythia utilizes them. this file should be stored in the same location as the lhe and powheg.input file.
+
+reweighting_powheg-v2.sh calculates weights for all pdfs in a set storing all the weights in seperate files.
+It then uses Reoganiser.cpp to make the weights compatible with pythia and uses pythia to shower all lhe files with different PDF weights.
+This file should be place in the main POWHEG-BOX-V2 directory.
+
+reweighting_powheg.sh is an older version reweighting_powheg-v2.sh that stores all the weights in one file. Unfortunately since pythia is shit, directly using these weights is hord so it's better to use v2 until a method for changing the weights directly in pythia has been produced.
+
+best_myscript.sh calculates the cross section of all member sets in PDF group through repeated monte carlo simulation. kind of shit and also slow. use if it turns out that reweighting_powheg-v2.sh is actually wrong.
