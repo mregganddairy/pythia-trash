@@ -1,5 +1,5 @@
 ! Number of events - use 0 for all LHEF events in the input file.
-Main:numberOfEvents = 0
+Main:numberOfEvents = 10
 
 ! Number of events to list and number of errors to allow.
 Next:numberShowLHA = 1
@@ -18,7 +18,7 @@ Init:showChangedParticleData = off
 
 ! Input file.
 Beams:frameType = 4
-Beams:LHEF =/home/Josh/physics/pythia/scripts_from_HPC/wp_pwgevents_14000.lhe
+Beams:LHEF =/home/Josh/physics/pythia/scripts_from_HPC/testOutput.out
 
 ! Number of outgoing particles of POWHEG Born level process
 ! (i.e. not counting additional POWHEG radiation)

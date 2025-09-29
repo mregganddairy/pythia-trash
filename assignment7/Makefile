@@ -20,3 +20,5 @@ plotPDFs_NN: plotPDFs_NN.cc
 	g++ -I/usr/include/LHAPDF `root-config --cflags` plotPDFs_NN.cc -o plotPDFs_NN -lLHAPDF `root-config --glibs`
 plotPDFs_NNN: plotPDFs_NNN.cc
 	g++ -I/usr/include/LHAPDF `root-config --cflags` plotPDFs_NNN.cc -o plotPDFs_NN -lLHAPDF `root-config --glibs`
+ratioPDFs: ratioPDFs.cc
+	g++ -I/usr/include/LHAPDF `root-config --cflags` ratioPDFs.cc -o ratioPDFs -lLHAPDF `root-config --glibs`

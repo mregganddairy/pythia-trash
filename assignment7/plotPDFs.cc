@@ -288,8 +288,8 @@ int main() {
 	adownshade->SetPoint(nPoints+i,x[nPoints-i-1],-Mdeltaad[nPoints-i-1]+adown[nPoints-i-1]);
 	}
 
-    TCanvas* c = new TCanvas("c", "PDFs", 800, 600);
-    c->SetLogx();
+    TCanvas* c1 = new TCanvas("c", "PDFs", 800, 600);
+    c1->SetLogx();
     //c->SetLogy();
 
 	gPStrange->Draw("ALP");
@@ -502,7 +502,7 @@ int main() {
 
 	*/
     // Save the plot
-    c->SaveAs((pdfSet + "PDFs.pdf").c_str());
+    c1->SaveAs((pdfSet + "PDFs.pdf").c_str());
 
     return 0;
 }

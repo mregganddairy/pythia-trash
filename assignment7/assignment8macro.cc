@@ -1,4 +1,4 @@
-//Calculating rapidity cross secion WITH UNCERTAINTY.
+//Calculating rapidity cross secions and ratios WITH UNCERTAINTY using the reweighting method, CORRECTLY.
 #include <TFile.h>
 #include <TNtuple.h>
 #include <TH1D.h>
@@ -9,7 +9,7 @@
 #include <cmath>
 
 //this function processes one file: it opens the ROOT file, fills the provided histogram, and scales it.
-double processFile(const std::string &filename, TH1D* hist) 
+double processFile(const std::string &filename, TH1D* hist, int VarNo) 
 {
     TFile* infile = TFile::Open(filename.c_str(), "READ");
     if (!infile || infile->IsZombie()) {
@@ -19,6 +19,9 @@ double processFile(const std::string &filename, TH1D* hist)
 
     std::vector<double>* Luminosity = nullptr;
     infile->GetObject("luminosity", Luminosity);
+
+	std::vector<std::vector<double>>* eventweights = nullptr;
+    infile->GetObject("Eventweights", eventweights);
     
     //getting the TNtuple with muon information
     TNtuple *muontuples = (TNtuple*)infile->Get("muons");
@@ -28,8 +31,8 @@ double processFile(const std::string &filename, TH1D* hist)
         delete infile;
         return -1;
     }
-    
-    Float_t eventNo, index, mother1, mother2, pAbs, pt, y, eta, id;
+
+    Float_t  eventNo, index, mother1, mother2, pAbs, pt, y, eta, id;
     int particle_count = muontuples->GetEntries();
     muontuples->SetBranchAddress("eventNo", &eventNo);
     muontuples->SetBranchAddress("index", &index);
@@ -40,15 +43,21 @@ double processFile(const std::string &filename, TH1D* hist)
     muontuples->SetBranchAddress("y", &y);
     muontuples->SetBranchAddress("eta", &eta);
     muontuples->SetBranchAddress("id", &id);
+
+
     
     for (int i = 0; i < particle_count; ++i) {
         muontuples->GetEntry(i);
         if ((std::abs(mother1) == 24) || ((std::abs(mother1)==13) && (std::abs(mother2)==90))) {
-            hist->Fill(eta);
+			int   EventNo = (int)eventNo;
+			double w0 = ((*eventweights)[EventNo][0]);
+			double wi = ((*eventweights)[EventNo][VarNo]);
+			double w = wi/w0;
+            hist->Fill(eta, w);
         }
     }
     
-    //normalize using luminosity
+    //normalize uing luminosity
     if (Luminosity && !Luminosity->empty()) {
         double scalebin = 1.0 / (*Luminosity)[0];
         hist->Scale(scalebin, "width");
@@ -58,10 +67,11 @@ double processFile(const std::string &filename, TH1D* hist)
     
     infile->Close();
     delete infile;
+	delete eventweights;
     return integral;
 }
 
-int assignment7macro4() 
+int assignment8macro() 
 {
     //define histogram binning parameters
     const int nbins = 50;
@@ -71,6 +81,7 @@ int assignment7macro4()
 	std::string PDFID= "274";
 	const int numVariations = 64; 
     
+			
 	TCanvas *c1 = new TCanvas(); //canvas for eta distribution  
 	TCanvas *c2 = new TCanvas(); //canvas for eta uncertainty ratios 
 	TCanvas *c3 = new TCanvas(); //canvas for ratio of W+/W-
@@ -83,7 +94,6 @@ int assignment7macro4()
 	TGraphAsymmErrors* WpUnc = new TGraphAsymmErrors(nbins);
 	TGraphAsymmErrors* WmUnc = new TGraphAsymmErrors(nbins);
 	TGraphAsymmErrors* ZUnc = new TGraphAsymmErrors(nbins);
-
 
 	//Uncerainty ratio plots
 	TGraph* UpperWpUncRat = new TGraph(nbins); 
@@ -105,7 +115,6 @@ int assignment7macro4()
 	TGraphErrors* R_ZW = new TGraphErrors(nbins);
 	TGraph* R_ZWUnc = new TGraph(nbins);
 
-
 	TGraphErrors* A_pm = new TGraphErrors(nbins);
 	TGraph* A_pmUnc = new TGraph(nbins);
 
@@ -113,7 +122,6 @@ int assignment7macro4()
 	vector<double> W_pUnc(nbins, 0);
 	vector<double> W_mUnc(nbins, 0);
 	vector<double> Z_Unc(nbins, 0);
-
 
 	TLegend *leg = new TLegend(0.6, 0.7, 0.9, 0.9);
 	TLegend *leg2 = new TLegend(0.6, 0.7, 0.9, 0.9);
@@ -126,11 +134,11 @@ int assignment7macro4()
 		std::string boson;
 		if (k == 0)
 		{
-			boson = "wm";
+			boson = "wp";
 		}
 		else if (k == 1)
 		{
-			boson = "wp";
+			boson = "wm";
 		}
 		else if (k == 2)
 		{
@@ -141,7 +149,7 @@ int assignment7macro4()
 	//	TString centralFilename = PDFID+"00_output/"+PDFID+"00_pythia_output/"+boson+"_pwgevents_"+PDFID+"00.root";
 		TString centralFilename = PDFID+"00_pythia_reweighted_output/"+PDFID+"00_pythia_output/"+boson+"_pwgevents_"+PDFID+"00.root";
 		TH1D* centralHist = new TH1D("centralHist", "Central Cross Section; #eta; d#sigma/d#eta", nbins, xlow, xhigh);
-		if (processFile(centralFilename.Data(), centralHist) < 0) {
+		if (processFile(centralFilename.Data(), centralHist, 0) < 0) {
 			std::cerr << "Error processing central file." << std::endl;
 			return 1;
 		}
@@ -150,15 +158,16 @@ int assignment7macro4()
 		std::vector<TH1D*> variationHists;
 		for (int i = 1; i <= numVariations; ++i) {
 			//getting names of files for each pdf 
-			std::ostringstream oss;
+			//std::ostringstream oss;
 			//oss << PDFID+"00_output/" << PDFID << "00_pythia_output/" << boson << "_pwgevents_" << PDFID << (i < 10 ? "0" : "") << i << ".root";
-			oss << PDFID+"00_pythia_reweighted_output/" << PDFID << "00_pythia_output/" << boson << "_pwgevents_" << PDFID << (i < 10 ? "0" : "") << i << ".root";
-			std::string varFilename = oss.str();
+			//oss << PDFID+"00_pythia_reweighted_output/" << PDFID << "00_pythia_output/" << boson << "_pwgevents_" << PDFID << "00.root";
+			//std::string varFilename = oss.str();
 			
 			//create a histogram for this variation (clone the binning of centralHist)
 			TH1D* hVar = new TH1D(Form("variation_%d", i), "Variation", nbins, xlow, xhigh);
-			if (processFile(varFilename, hVar) < 0) {
-				std::cerr << "Error processing file: " << varFilename << std::endl;
+			if (processFile(centralFilename.Data(), hVar, i) < 0) 
+			{
+				std::cerr << "Error processing file: " << centralFilename << std::endl;
 				continue;
 			}
 			variationHists.push_back(hVar);
@@ -189,16 +198,6 @@ int assignment7macro4()
 				sumUpperUncert += std::pow(std::max(std::max(plus - zero, minus - zero), 0.0),2);
 				sumLowerUncert += std::pow(std::max(std::max(zero - plus, zero - minus), 0.0),2);
 				sumSymmUncert += std::pow(plus - minus,2);
-				/*
-				if (bin==50)
-				{
-				cout << "bin 50 uncertainty percentage:	" <<100*std::sqrt(sumSymmUncert)*0.5/zero << endl;
-				}
-				if (bin==20)
-				{
-				cout << "bin 20 uncertainty percentage:	" << 100*std::sqrt(sumSymmUncert)*0.5/zero << endl;
-				}
-				*/
 
 			}
 			double upperUncert = std::sqrt(sumUpperUncert);
@@ -473,7 +472,7 @@ int assignment7macro4()
 	R_ZWUnc->SetMaximum(40);
 	R_ZWUnc->SetLineColor(kViolet);
 	R_ZWUnc->GetYaxis()->SetTitle("Uncerainty Percentage (%)");
-	R_ZWUnc->GetXaxis()->SetTitle("y");
+	R_ZWUnc->GetXaxis()->SetTitle("#eta");
 	R_ZWUnc->Draw("AP");
 	leg5->AddEntry(R_ZWUnc, "R_{Z/W}", "lep");
 
@@ -500,7 +499,7 @@ int assignment7macro4()
 	c6->Write();
 	c7->Write();
 	outFile->Close();
-	delete outFile;
+	//delete outFile;
 
 	return 1;
     
