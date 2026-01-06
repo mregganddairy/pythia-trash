@@ -8,6 +8,9 @@
 #include <iostream>
 #include <cmath>
 
+#include <TPad.h>
+#include <TLatex.h>
+
 //this function processes one file: it opens the ROOT file, fills the provided histogram, and scales it.
 double processFile(const std::string &filename, TH1D* hist, int VarNo) 
 {
@@ -46,14 +49,18 @@ double processFile(const std::string &filename, TH1D* hist, int VarNo)
 
 
     
-    for (int i = 0; i < particle_count; ++i) {
+    for (int i = 0; i < particle_count; ++i)
+	{
         muontuples->GetEntry(i);
-        if ((std::abs(mother1) == 24) || ((std::abs(mother1)==13) && (std::abs(mother2)==90))) {
-			int   EventNo = (int)eventNo;
-			double w0 = ((*eventweights)[EventNo][0]);
-			double wi = ((*eventweights)[EventNo][VarNo]);
-			double w = wi/w0;
-            hist->Fill(eta, w);
+        if ((std::abs(mother1) == 24) || ((std::abs(mother1)==13) && (std::abs(mother2)==90))) 
+		{
+			//if ((std::abs(eta) <2.4) && (pt > 25)){
+				int   EventNo = (int)eventNo;
+				double w0 = ((*eventweights)[EventNo][0]);
+				double wi = ((*eventweights)[EventNo][VarNo]);
+				double w = wi/w0;
+				hist->Fill(eta, w);
+			//}
         }
     }
     
@@ -81,11 +88,11 @@ int assignment8macro3()
 	const int nPDFs = 3;
 	double_t binwidth = (xhigh-xlow)/(2*nbins);
 	cout<<binwidth;
-	//
+	
 
 	std::vector<std::string> PDFIDs= {"274", "140", "3311"};
-	const std::vector<int> AllnumVariations = {64, 58, 99}; 
-	//const std::vector<int> AllnumVariations = {8, 8, 4}; 
+//	const std::vector<int> AllnumVariations = {64, 58, 99}; 
+	const std::vector<int> AllnumVariations = {1, 1, 1}; 
 
 	
 	//vectors with the values and uncertainty of each of each boson
@@ -104,15 +111,19 @@ int assignment8macro3()
 
 			
 	TCanvas *c1 = new TCanvas(); //canvas for eta of W+
+	TPad *upperPad1 = new TPad("upperPad1", "upperPad1", 0.02, 0.32, 0.9, 0.9);
+	TPad *lowerPad1 = new TPad("lowerPad1", "lowerPad1", 0.02, 0.02, 0.9, 0.32);
 	TCanvas *c2 = new TCanvas(); //canvas for eta of W-
+	TPad *upperPad2 = new TPad("upperPad2", "upperPad2", 0.02, 0.32, 0.9, 0.9);
+	TPad *lowerPad2 = new TPad("lowerPad2", "lowerPad2", 0.02, 0.02, 0.9, 0.32);
 	TCanvas *c3 = new TCanvas(); //canvas for eta of Z
-	TCanvas *c4 = new TCanvas(); //Canvas for pt of W+
-	TCanvas *c5 = new TCanvas(); //Canvas for pt of W-
-	TCanvas *c6 = new TCanvas(); //Canvas for pt of Z
+	TPad *upperPad3 = new TPad("upperPad3", "upperPad3", 0.02, 0.32, 0.9, 0.9);
+	TPad *lowerPad3 = new TPad("lowerPad3", "lowerPad3", 0.02, 0.02, 0.9, 0.32);
 
 	TLegend *leg = new TLegend(0.6, 0.7, 0.9, 0.9);
 	TLegend *leg2 = new TLegend(0.6, 0.7, 0.9, 0.9);
 	TLegend *leg3 = new TLegend(0.6, 0.7, 0.9, 0.9);
+
 	TLegend *leg4 = new TLegend(0.6, 0.7, 0.9, 0.9);
 	TLegend *leg5 = new TLegend(0.6, 0.7, 0.9, 0.9);
 	TLegend *leg6 = new TLegend(0.6, 0.7, 0.9, 0.9);
@@ -139,26 +150,6 @@ int assignment8macro3()
 		TGraphAsymmErrors* WpUnc = new TGraphAsymmErrors(nbins);
 		TGraphAsymmErrors* WmUnc = new TGraphAsymmErrors(nbins);
 		TGraphAsymmErrors* ZUnc = new TGraphAsymmErrors(nbins);
-
-
-		TGraph* WpCentre = new TGraph(nbins);
-		TGraph* WmCentre = new TGraph(nbins);
-		TGraph* ZCentre = new TGraph(nbins);
-
-
-		//Uncerainty ratio plots
-		TGraph* UpperWpUncRat = new TGraph(nbins); 
-		TGraph* LowerWpUncRat = new TGraph(nbins);
-		TGraph* SymmWpUncRat = new TGraph(nbins);
-
-		TGraph* UpperWmUncRat = new TGraph(nbins); 
-		TGraph* LowerWmUncRat = new TGraph(nbins); 
-		TGraph* SymmWmUncRat = new TGraph(nbins);
-
-		TGraph* UpperZUncRat = new TGraph(nbins); 
-		TGraph* LowerZUncRat = new TGraph(nbins); 
-		TGraph* SymmZUncRat = new TGraph(nbins);
-		
 
 		//Uncertainty vectors for boson cross sections
 		vector<double> W_pUnc(nbins, 0);
@@ -195,6 +186,7 @@ int assignment8macro3()
 				//getting names of files for each pdf 
 				
 				//create a histogram for this variation (clone the binning of centralHist)
+				cout << i;
 				TH1D* hVar = new TH1D(Form("variation_%d", i), "Variation", nbins, xlow, xhigh);
 				if (processFile(centralFilename.Data(), hVar, i) < 0) 
 				{
@@ -211,10 +203,8 @@ int assignment8macro3()
 			TH1D* symmUncertaintyHist = (TH1D*)centralHist->Clone("uncertaintyHist");
 			uncertaintyHist->Reset();
 			
+
 			//compute the uncertainty in each bin
-
-			
-
 			for (int bin = 1; bin <= nbins; bin++)
 			{
 				double sumUpperUncert = 0.0;
@@ -265,6 +255,18 @@ int assignment8macro3()
 				y_lower_uncertainty_values[j][k][bin-1] = lowerUncert;
 				y_upper_uncertainty_values[j][k][bin-1] = upperUncert;
 
+				if (j==1) 
+				{
+				y_lower_uncertainty_values[j][k][bin-1] = lowerUncert/1.645;
+				y_upper_uncertainty_values[j][k][bin-1] = upperUncert/1.645;
+				}
+
+				else
+				{
+				y_lower_uncertainty_values[j][k][bin-1] = lowerUncert;
+				y_upper_uncertainty_values[j][k][bin-1] = upperUncert;
+				}
+				
 				upperUncertaintyHist->SetBinContent(bin, upperUncert);
 				lowerUncertaintyHist->SetBinContent(bin, lowerUncert);
 				symmUncertaintyHist->SetBinContent(bin, SymmUncert);
@@ -272,11 +274,8 @@ int assignment8macro3()
 			
 
 			WmUnc->GetYaxis()->SetTitle("d#sigma/d#eta (pb)");
-			WmUnc->GetXaxis()->SetTitle("#eta");
 			WpUnc->GetYaxis()->SetTitle("d#sigma/d#eta (pb)");
-			WpUnc->GetXaxis()->SetTitle("#eta");
 			ZUnc->GetYaxis()->SetTitle("d#sigma/d#eta (pb)");
-			ZUnc->GetXaxis()->SetTitle("#eta");
 
 
 			//plotting graphs
@@ -302,68 +301,18 @@ int assignment8macro3()
 				double refy =1.; //reference pdf value for ratio plot
 
 
-				if (k==0)
+				if (k==1)
 				{
-
 					WmUnc->SetPoint(bin-1, x, y);
 					WmUnc->SetPointError(bin-1, 0, 0,lowerErr, upperErr);
 					W_mUnc[bin-1] = symmErr;
-
-					if (j != 0)
-					{
-						refy = RefCentreWmUnc->GetPointY(bin-1);
-						WmCentre->SetPoint(bin-1, x, y/refy);
-						UpperWmUncRat->SetPoint(bin-1, x, y/refy*(1+(upperErr)/y));
-						LowerWmUncRat->SetPoint(bin-1, x, y/refy*(1-(lowerErr)/y));
-
-						cout << y/refy << "*" <<"(1-(" << lowerErr << ")/"<< y <<"))= "<< y/refy*(1-(lowerErr)/y)<<endl;
-
-						cout << y_ratio_values[j][k][bin-1] << "*" <<"(1-("
-							<< y_lower_uncertainty_values[j][k][bin-1] << ")/"<< y_values[j][k][bin-1] <<"))= "
-							<<y_ratio_values[j][k][bin-1]*(1-(y_lower_uncertainty_values[j][k][bin-1])/y_values[j][k][bin-1])<< endl;
-
-						SymmWmUncRat->SetPoint(bin-1, x, y/refy+(std::abs(symmErr)/refy));
-					}
-
-					else if (j==0)
-					{
-						WmCentre->SetPoint(bin-1, x, y/refy);
-						UpperWmUncRat->SetPoint(bin-1, x, y/y*(1+(upperErr)/y));
-						cout << y << "/" << y << "*" <<"(1+(" << upperErr << ")/"<< y <<"))= "<< y/y*(1+(upperErr)/y)<< endl;
-						LowerWmUncRat->SetPoint(bin-1, x, y/y*(1-(lowerErr)/y));
-						SymmWmUncRat->SetPoint(bin-1, x, y/y+(std::abs(symmErr)/y));
-					}
-
-
-					std::cout << "bin: "<<bin << "	central:  " << y << endl;
-					std::cout << "bin: "<<bin << "	upperErr: " << upperErr << endl;
-					std::cout << "bin: "<<bin << "	lowerErr: " << lowerErr << endl;
 				}
 
-				else if (k==1)
+				else if (k==0)
 				{
-
 					WpUnc->SetPoint(bin-1, x, y);
 					WpUnc->SetPointError(bin-1, 0, 0,lowerErr, upperErr);
 					W_pUnc[bin-1] = symmErr;
-
-					if (j != 0)
-					{
-						refy = RefCentreWpUnc->GetPointY(bin);
-						WpCentre->SetPoint(bin-1, x, y/refy);
-						UpperWpUncRat->SetPoint(bin-1, x, y/refy*(1+(upperErr)/y));
-						LowerWpUncRat->SetPoint(bin-1, x, y/refy*(1-(lowerErr)/y));
-						SymmWpUncRat->SetPoint(bin-1, x, y/refy+(std::abs(symmErr)/y));
-					}
-
-					else if (j==0)
-					{
-						UpperWpUncRat->SetPoint(bin-1, x, y/refy*(1+(upperErr)/y));
-						LowerWpUncRat->SetPoint(bin-1, x, y/refy*(1-(lowerErr)/y));
-						SymmWpUncRat->SetPoint(bin-1, x, y/y+(std::abs(symmErr)/y));
-					}
-
-
 				}
 
 				else if (k==2)
@@ -371,46 +320,10 @@ int assignment8macro3()
 					ZUnc->SetPoint(bin-1, x, y);
 					ZUnc->SetPointError(bin-1, 0, 0,lowerErr, upperErr);
 					Z_Unc[bin-1] = symmErr;
-
-					if (j != 0)
-					{
-						refy = RefCentreWmUnc->GetPointY(bin);
-						ZCentre->SetPoint(bin-1, x, y/refy);
-						UpperZUncRat->SetPoint(bin-1, x, y/refy*(1+(upperErr)/y));
-						LowerZUncRat->SetPoint(bin-1, x, y/refy*(1-(lowerErr)/y));
-						SymmZUncRat->SetPoint(bin-1, x, y/refy+(std::abs(symmErr)/refy));
-					}
-
-					else if (j==0)
-					{
-						UpperZUncRat->SetPoint(bin-1, x, y/refy*(1+(upperErr)/y));
-						LowerZUncRat->SetPoint(bin-1, x, y/refy*(1-(lowerErr)/y));
-						SymmZUncRat->SetPoint(bin-1, x, y/y+(std::abs(symmErr)/y));
-					}
 				}
 
 			}
 
-
-			if (j==0)
-			{
-				RefCentreWmUnc = (TGraph*)WmCentre->Clone("RefCentreWmUnc");
-				RefCentreWpUnc = (TGraph*)WpCentre->Clone("RefCentreWpUnc");
-				RefCentreZUnc = (TGraph*)ZCentre->Clone("RefCentreZUnc");
-
-				for (int bin = 1; bin <= nbins; ++bin)
-				{
-					double x = centralHist->GetBinCenter(bin);
-					double y = centralHist->GetBinContent(bin);
-
-					WmCentre->SetPoint(bin-1, x, y/y);
-					WpCentre->SetPoint(bin-1, x, y/y);
-					ZCentre->SetPoint(bin-1, x, y/y);
-
-				}
-			
-
-			}
 			
 
 			std::vector<int> colours = {2, 4, 6};
@@ -424,49 +337,54 @@ int assignment8macro3()
 			if (k==0)
 			{
 				c1->cd();
-				c1->SetGridy();
+				upperPad1->Draw();
+				upperPad1->cd();
 				
 				WmUnc->SetTitle("W^{-}");
 				WmUnc->SetMarkerStyle(markers[j]);
 				WmUnc->SetMarkerColor(colours[j]);
+				WmUnc->SetFillStyle(fills[j]);
 				WmUnc->SetLineColor(colours[j]);
 				WmUnc->SetMarkerSize(0.8);
-				WmUnc->SetMinimum(0);
-				WmUnc->SetMaximum(2000);
-				if (j==0) WmUnc->Draw("AP");
-				else WmUnc->Draw("P SAME");
-				leg->AddEntry(WmUnc, PDFnames[j], "lep");
+				WmUnc->GetXaxis()->SetRangeUser(xlow, xhigh);
+				if (j==0) WmUnc->Draw("ASP");
+				else WmUnc->Draw("SP SAME");
+				leg->AddEntry(WmUnc, PDFnames[j], "fp");
 				if (j==(PDFIDs.size()-1)) leg->Draw("SAME");
 				
 			}
 			else if (k==1)
 			{
 				c2->cd();
-				c2->SetGridy();
+				upperPad2->Draw();
+				upperPad2->cd();
 
 				WpUnc->SetTitle("W^{+}");
 				WpUnc->SetMarkerStyle(markers[j]);
 				WpUnc->SetMarkerColor(colours[j]);
 				WpUnc->SetLineColor(colours[j]);
 				WpUnc->SetMarkerSize(0.8);
+				WpUnc->GetXaxis()->SetRangeUser(xlow, xhigh);
 				if (j==0) WpUnc->Draw("AP");
-				else WpUnc->Draw("P SAME");
-				leg2->AddEntry(WpUnc, PDFnames[j], "lep");
+				else WpUnc->Draw("SP SAME");
+				leg2->AddEntry(WpUnc, PDFnames[j], "fp");
 				if (j==(PDFIDs.size()-1)) leg2->Draw("SAME");
 			}
 			else if (k==2)
 			{
 				c3->cd();
-				c3->SetGridy();
+				upperPad3->Draw();
+				upperPad3->cd();
 
 				ZUnc->SetTitle("Z");
 				ZUnc->SetMarkerStyle(markers[j]);
 				ZUnc->SetMarkerColor(colours[j]);
 				ZUnc->SetLineColor(colours[j]);
-				ZUnc->SetMarkerSize(0.7);
-				if (j==0) ZUnc->Draw("AP");
-				else ZUnc->Draw("P SAME");
-				leg3->AddEntry(ZUnc, PDFnames[j], "lep");
+				ZUnc->SetMarkerSize(0.8);
+				ZUnc->GetXaxis()->SetRangeUser(xlow, xhigh);
+				if (j==0) ZUnc->Draw("ASP");
+				else ZUnc->Draw("SP SAME");
+				leg3->AddEntry(ZUnc, PDFnames[j], "fp");
 				if (j==(PDFIDs.size()-1)) leg3->Draw("SAME");
 
 			}
@@ -475,10 +393,12 @@ int assignment8macro3()
 			
 			if (k==0)
 			{
-				c4->cd();
-				c4->SetGridy();
+				c1->cd();
+				lowerPad1->Draw();
+				lowerPad1->cd();
 
-				TGraphMultiErrors* Wmratio = new TGraphMultiErrors("Wmratio", "W^{-}", nbins, x_values, y_ratio_values[j][k], binwidth_vector, binwidth_vector, stat_uncertainty, stat_uncertainty);
+				TGraphMultiErrors* Wmratio = new TGraphMultiErrors("Wmratio", " ", nbins, x_values,
+						y_ratio_values[j][k], binwidth_vector, binwidth_vector, stat_uncertainty, stat_uncertainty);
 				Wmratio->AddYError(nbins, y_ratio_lower_uncertainty_values[j][k], y_ratio_upper_uncertainty_values[j][k]);
 
 				Wmratio->SetMarkerStyle(markers[j]);
@@ -486,53 +406,33 @@ int assignment8macro3()
 				Wmratio->GetAttFill(0)->SetFillStyle(fills[j]);
 				Wmratio->GetAttFill(0)->SetFillColor(colours[j]);
 				Wmratio->SetMarkerColor(colours[j]);
+				Wmratio->GetXaxis()->SetTitle("#eta");
 
 				Wmratio->GetAttLine(1)->SetLineColor(colours[j]);
 				Wmratio->GetAttFill(1)->SetFillStyle(fills[j]);
 				Wmratio->GetAttFill(1)->SetFillColor(colours[j]);
 				Wmratio->SetMaximum(1.1);
 				Wmratio->SetMinimum(.9);
+				Wmratio->SetMarkerSize(0.8);
+				Wmratio->GetXaxis()->SetRangeUser(xlow, xhigh);
+				Wmratio->GetYaxis()->SetTitle("ratio");
 
 				if (j==0) Wmratio->Draw("APS s=0.0 ; ; 5");
 				else Wmratio->Draw("PS SAME s=0.0 ; ; 5");
-
-				leg4->AddEntry(Wmratio, PDFnames[j], "fp");
-				if (j==(PDFIDs.size()-1)) leg4->Draw();
-
-				/*
-				c5->cd();
-				c5->SetGridy();
-				UpperWmUncRat->SetTitle("W^{-}");
-				UpperWmUncRat->SetMarkerStyle(73);
-				UpperWmUncRat->SetMarkerColor(colours[j]);
-				UpperWmUncRat->SetLineColor(colours[j]);
-				if (j==0) UpperWmUncRat->Draw("AP");
-				else  UpperWmUncRat->Draw("P SAME");
-				UpperWmUncRat->GetYaxis()->SetTitle("Percentage Uncertainty (%)");
-				UpperWmUncRat->GetXaxis()->SetTitle("y");
-				UpperWmUncRat->SetMaximum(1.1);
-				UpperWmUncRat->SetMinimum(.9);
-
-
-				leg4->AddEntry(UpperWmUncRat, PDFnames[j], "lep");
-				WmCentre->SetMarkerSize(52);
-				WmCentre->Draw("P SAME");
-
-				LowerWmUncRat->SetMarkerStyle(73);
-				LowerWmUncRat->SetMarkerColor(colours[j]);
-				LowerWmUncRat->SetLineColor(colours[j]);
-				LowerWmUncRat->Draw("P SAME");
-				if (j==(PDFIDs.size()-1)) leg4->Draw();
-				*/
 				
 			}
 
 			else if (k==1)
 
 			{
-				c5->cd();
-				c5->SetGridy();
-				TGraphMultiErrors* Wpratio = new TGraphMultiErrors("Wpratio", "W^{+}", nbins, x_values, y_ratio_values[j][k], binwidth_vector, binwidth_vector, stat_uncertainty, stat_uncertainty);
+				c2->cd();
+				lowerPad2->Draw();
+				lowerPad2->cd();
+
+				TGraphMultiErrors* Wpratio = new TGraphMultiErrors("Wpratio", " ", nbins, x_values,
+						y_ratio_values[j][k], binwidth_vector, binwidth_vector, stat_uncertainty, stat_uncertainty);
+
+
 				Wpratio->AddYError(nbins, y_ratio_lower_uncertainty_values[j][k], y_ratio_upper_uncertainty_values[j][k]);
 
 				Wpratio->SetMarkerStyle(markers[j]);
@@ -546,39 +446,29 @@ int assignment8macro3()
 				Wpratio->GetAttFill(1)->SetFillColor(colours[j]);
 				Wpratio->SetMaximum(1.1);
 				Wpratio->SetMinimum(.9);
+				Wpratio->SetMarkerSize(0.8);
+				Wpratio->GetXaxis()->SetRangeUser(xlow, xhigh);
+				Wpratio->GetXaxis()->SetTitle("#eta");
+				Wpratio->GetYaxis()->SetTitle("ratio");
 
 				if (j==0) Wpratio->Draw("APS s=0.0 ; ; 5");
 				else Wpratio->Draw("PS SAME s=0.0 ; ; 5");
 
-				leg5->AddEntry(Wpratio, PDFnames[j], "fp");
-				if (j==(PDFIDs.size()-1)) leg5->Draw();
+				//leg5->AddEntry(Wpratio, PDFnames[j], "fp");
+				//if (j==(PDFIDs.size()-1)) leg5->Draw();
 
-				/*
-				UpperWpUncRat->SetTitle("W^{+}");
-				UpperWpUncRat->SetMarkerStyle(72);
-				UpperWpUncRat->SetMarkerColor(colours[j]);
-				UpperWpUncRat->SetLineColor(colours[j]);
-				UpperWpUncRat->SetMaximum(1.1);
-				UpperWpUncRat->SetMinimum(.9);
-				if (j==0) UpperWpUncRat->Draw("AP");
-				else  UpperWpUncRat->Draw("P SAME");
-				WpCentre->Draw("P SAME");
-				leg5->AddEntry(UpperWpUncRat, PDFnames[j], "lep");
-
-				LowerWpUncRat->SetMarkerStyle(72);
-				LowerWpUncRat->SetMarkerColor(colours[j]);
-				LowerWpUncRat->SetLineColor(colours[j]);
-				LowerWpUncRat->Draw("P SAME");
-				if (j==(PDFIDs.size()-1)) leg5->Draw();
-				*/
 			}
 
 			else if (k==2)
 
 			{
-				c6->cd();
-				c6->SetGridy();
-				TGraphMultiErrors* Zratio = new TGraphMultiErrors("Wpratio", "W^{+}", nbins, x_values, y_ratio_values[j][k], binwidth_vector, binwidth_vector, stat_uncertainty, stat_uncertainty);
+				c3->cd();
+				lowerPad3->Draw();
+				lowerPad3->cd();
+
+				TGraphMultiErrors* Zratio = new TGraphMultiErrors("Zratio", " ", nbins, x_values,
+						y_ratio_values[j][k], binwidth_vector, binwidth_vector, stat_uncertainty, stat_uncertainty);
+
 				Zratio->AddYError(nbins, y_ratio_lower_uncertainty_values[j][k], y_ratio_upper_uncertainty_values[j][k]);
 
 				Zratio->SetMarkerStyle(markers[j]);
@@ -592,32 +482,17 @@ int assignment8macro3()
 				Zratio->GetAttFill(1)->SetFillColor(colours[j]);
 				Zratio->SetMaximum(1.1);
 				Zratio->SetMinimum(.9);
+				Zratio->SetMarkerSize(0.8);
+				Zratio->GetXaxis()->SetRangeUser(xlow, xhigh);
+				Zratio->GetXaxis()->SetTitle("#eta");
+				Zratio->GetYaxis()->SetTitle("ratio");
 
 				if (j==0) Zratio->Draw("APS s=0.0 ; ; 5");
 				else Zratio->Draw("PS SAME s=0.0 ; ; 5");
 
-				leg6->AddEntry(Zratio, PDFnames[j], "fp");
-				if (j==(PDFIDs.size()-1)) leg6->Draw();
+				//leg6->AddEntry(Zratio, PDFnames[j], "fp");
+				//if (j==(PDFIDs.size()-1)) leg6->Draw();
 
-				/*
-				UpperZUncRat->SetTitle("Z");
-				UpperZUncRat->SetMarkerStyle(71);
-				UpperZUncRat->SetMarkerColor(colours[j]);
-				UpperZUncRat->SetLineColor(colours[j]);
-				UpperZUncRat->SetMaximum(1.1);
-				UpperZUncRat->SetMinimum(.9);
-				if (j==0) UpperZUncRat->Draw("AP");
-				else  UpperZUncRat->Draw("P SAME");
-				leg6->AddEntry(UpperZUncRat, PDFnames[j], "lep");
-				ZCentre->Draw("P SAME");
-
-				LowerZUncRat->SetMarkerStyle(71);
-				LowerZUncRat->SetMarkerColor(colours[j]);
-				LowerZUncRat->SetLineColor(colours[j]);
-				LowerZUncRat->Draw("P SAME");
-
-				if (j==(PDFIDs.size()-1)) leg6->Draw();
-				*/
 			}
 
 			//Clean up histograms (include or shit breaks)
@@ -633,9 +508,6 @@ int assignment8macro3()
 	c1->Write();
 	c2->Write();
 	c3->Write();
-	c4->Write();
-	c5->Write();
-	c6->Write();
 	outFile->Close();
 	//delete outFile;
 

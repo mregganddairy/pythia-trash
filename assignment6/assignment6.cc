@@ -36,7 +36,7 @@ int main() {
 	TNtuple* muontuples;
 	vector<double> Luminosity(1); //luminosity from generated process sigma to calculate cross sections
 
-	TFile* outFile = new TFile("wm_NLOmuonyield.root", "RECREATE");
+	TFile* outFile = new TFile("testGammaInteference.root", "RECREATE");
 	muontuples = new TNtuple("mu_stuff", "mu_stuff", "eventNo:index:status:mother1:mother2:daughter1:daughter2:pAbs:pt:y:eta:id");
 
 

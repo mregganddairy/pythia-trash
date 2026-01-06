@@ -1,5 +1,6 @@
 #include <LHAPDF/LHAPDF.h>
 #include <TCanvas.h>
+#include <TFile.h>
 #include <TGraph.h>
 #include <TLegend.h>
 #include <TAxis.h>
@@ -19,7 +20,9 @@ int PDFxf(const std::string pdfSetName, int nPoints, double x[500], double PDFVa
 	LHAPDF::PDF* pdf = LHAPDF::mkPDF(pdfSetName,0);
 	
 	
-	const double Q =80.4;//units of GeV
+	//const double Q =80.4;//units of GeV
+	//const double Q =std::sqrt(10.);//units of GeV
+	const double Q =std::sqrt(80.4);//units of GeV
 	double Q2 =std::pow(Q, 2.0);
 	const double xMin = 1e-6, xMax = 0.9;
 
@@ -105,6 +108,7 @@ int main()
 	double PDFValues[3][11][nPoints];
 	const std::vector<std::string> pdfSet = {"MSHT20nnlo_as118","CT18NNLO","NNPDF40_nnlo_as_01180"};
 	std::vector<const char*> charpdfSet = {"MSHT20nnlo_as118","CT18NNLO","NNPDF40_nnlo_as_01180"};
+	std::vector<const char*> charpdfTitles = {"MSHT20NNLO","CT18NNLO","NNPDF40NNLO"};
 	std::vector<const char*> partons = {"gluon", "down", "up", "strange", "charm", "bottom", "anti-down", "anti-up", "anti-strange", "anti-charm", "anti-bottom"};
 	std::vector<std::string> partonstring = {"gluon", "down", "up", "strange", "charm", "bottom", "anti-down", "anti-up", "anti-strange", "anti-charm", "anti-bottom"};
 
@@ -142,8 +146,16 @@ int main()
 			//Setting position of lower and upperbounds on plots
 			for (int i=0;i<nPoints;i++)
 			{
+				if (j==0)
+				{
+				Pgraphs[j][k]->SetPoint(i, x[i], PDFUpperuncertainty[j][k][i]/1.645 +PDFValues[j][k][i]);
+				Mgraphs[j][k]->SetPoint(i, x[i], -PDFLoweruncertainty[j][k][i]/1.645 +PDFValues[j][k][i]);
+				}
+				else
+				{
 				Pgraphs[j][k]->SetPoint(i, x[i], PDFUpperuncertainty[j][k][i] +PDFValues[j][k][i]);
 				Mgraphs[j][k]->SetPoint(i, x[i], -PDFLoweruncertainty[j][k][i] +PDFValues[j][k][i]);
+				}
 
 				//Stuff for creating shading between lower and upper bounds
 				Shade.at(j).at(k)->SetPoint(i,x[i], PDFUpperuncertainty[j][k][i]+PDFValues[j][k][i]);
@@ -229,22 +241,28 @@ int main()
 	std::vector<std::vector<TGraph*>> shaderatios(3, std::vector<TGraph*>(11));
 
 	std::vector<TLegend*> partonlegend(11);
+	
 
+	TFile* outFile = new TFile("PDFRatios.root","RECREATE");
 	for (int k = 0; k < 11; ++k)
 	{
 		cparton.at(k) = new TCanvas(partons[k], partons[k], 800, 600);
-		partonlegend[k]= new TLegend(0.9, 0.7, 0.5, 0.9);
+		partonlegend[k]= new TLegend(0.75, 0.7, 0.35, 0.9);
 		for (int j= 0; j<3; ++j)
 		{
 			centralratios.at(j).at(k) = new TGraph(nPoints, x, PDFValues[j][k]);
 			Pratios.at(j).at(k) = new TGraph(nPoints, x, PDFValues[j][k]);
 			Mratios.at(j).at(k) = new TGraph(nPoints, x, PDFValues[j][k]);
 			shaderatios.at(j).at(k) = new TGraph(2*nPoints);
+
+			centralratios[j][k]->SetLineColor(j+2);
 			Pratios[j][k]->SetLineColor(j+2);
+			Pratios[j][k]->SetLineStyle(9);
 			Mratios[j][k]->SetLineColor(j+2);
+			Mratios[j][k]->SetLineStyle(9);
 			shaderatios[j][k]->SetFillColor(j+2);
 
-			partonlegend[k]->AddEntry(shaderatios[j][k], charpdfSet[j] , "f");
+			partonlegend[k]->AddEntry(shaderatios[j][k], charpdfTitles[j] , "f");
 
 			for (int i =0; i <nPoints; ++i)
 			{
@@ -262,14 +280,19 @@ int main()
 			if (j==0) 
 			{
 				centralratios[j][k]->Draw("ALP");
-				centralratios[j][k]->SetTitle((partonstring[k]+" at Q^{2} = M^{2}_{W}").c_str());
+				centralratios[j][k]->SetTitle((partonstring[k]+" at Q^{2} = M_{W}^{2} GeV^{2}").c_str());
 				centralratios[j][k]->GetXaxis()->SetTitle("x");
-				centralratios[j][k]->GetYaxis()->SetTitle("xf(x, Q^{2}) ratio");
+				centralratios[j][k]->GetYaxis()->SetTitle("xf(x, Q^{2}) ratio to NNPDF4.0NNLO");
+				centralratios[j][k]->GetYaxis()->CenterTitle(true);
+				centralratios[j][k]->GetYaxis()->SetTitleSize(0.045);
+				centralratios[j][k]->GetXaxis()->SetTitleSize(0.05);
 				shaderatios[j][k]->SetFillStyle(3001);
 			}
 			else centralratios[j][k]->Draw("L SAME");
-			if (j==1) shaderatios[j][k]->SetFillStyle(3325);
-			if (j==2) shaderatios[j][k]->SetFillStyle(3352);
+			if (j==1) shaderatios[j][k]->SetFillStyle(3001);
+			if (j==2) shaderatios[j][k]->SetFillStyle(3021);
+			if (j==0) shaderatios[j][k]->SetFillStyle(3022);
+			//if (j==2) shaderatios[j][k]->SetFillStyle(3352);
 			
 			Pratios[j][k]->Draw("L SAME");
 			Mratios[j][k]->Draw("L SAME");
@@ -280,8 +303,10 @@ int main()
 			partonlegend[k]->Draw();
 
 		}
-		cparton.at(k)->SaveAs((partonstring.at(k)+ "_ratioPDFs.pdf").c_str());
+		cparton.at(k)->SaveAs((partonstring.at(k)+ "Q=M_ratioPDFs.pdf").c_str());
+		cparton.at(k)->Write();
 	}
+	outFile->Close();
 
     return 0;
 }

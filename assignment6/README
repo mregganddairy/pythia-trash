@@ -3,3 +3,4 @@ macro1 considers just the pt cross section of NLO
 macro2 considers the pt cross section from both NLO and LO and compares the two
 macro3 adds the background processes to the NLO pt cross section
 macro4 adds the background processes to the NLO rapidity cross section
+macro5 is a more sophisticated version of macro3, that provides the total yield and pt cross section in more detail

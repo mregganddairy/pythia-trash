@@ -1,5 +1,6 @@
 #include <LHAPDF/LHAPDF.h>
 #include <TCanvas.h>
+#include <TFile.h>
 #include <TGraph.h>
 #include <TLegend.h>
 #include <TAxis.h>
@@ -9,11 +10,17 @@
 #include <cmath>
 
 int main() {
-	const std::string pdfSet = "MSHT20nnlo_as118";
+	const std::string pdfSet = "CT18NNLO";
+	const std::string Title = "CT18NNLO";
+
+	double Zfactor = 1;
+	if (pdfSet=="CT18NNLO"){Zfactor=1.645;}
+
 	std::vector<LHAPDF::PDF*> pdfs = LHAPDF::mkPDFs(pdfSet); //0th member of the set
 	LHAPDF::PDF* pdf = LHAPDF::mkPDF(pdfSet,0);
 	
 	const double Q =80.4;//units of GeV
+	//const double Q = std::sqrt(10);
 	double Q2 =std::pow(Q, 2.0);
 	const int nPoints = 500;
 	const double xMin = 1e-4, xMax = 1.0;
@@ -121,78 +128,132 @@ int main() {
 			std::cout << "charm[" << i << "] = " << charm[i] << std::endl;
 				std::cout << "test[" << i << "] = " << std::max(gluon[i] - Pgluon[i], gluon[i] - Mgluon[i]) << std::endl;
 			*/
-			Pdeltag[i] += std::pow(std::max(std::max(Pgluon[i] - gluon[i], Mgluon[i] - gluon[i]), 0.0),2);
-			Mdeltag[i] += std::pow(std::max(std::max(gluon[i] - Pgluon[i], gluon[i] - Mgluon[i]), 0.0),2);
 
 
-			Pdeltau[i] += std::pow(std::max(std::max(Pup[i] - up[i], Mup[i] - up[i]), 0.0),2);
-			Mdeltau[i] += std::pow(std::max(std::max(up[i] - Pup[i], up[i] - Mup[i]), 0.0),2);
+			if (pdfSet=="NNPDF40_nnlo_as_01180")
+			{
 
-			Pdeltad[i] += std::pow(std::max(std::max(Pdown[i] - down[i], Mdown[i] - down[i]), 0.0),2);
-			Mdeltad[i] += std::pow(std::max(std::max(down[i] - Pdown[i], down[i] - Mdown[i]), 0.0),2);
-
-			Pdeltas[i] += std::pow(std::max(std::max(Pstrange[i] - strange[i], Mstrange[i] - strange[i]), 0.0),2);
-			Mdeltas[i] += std::pow(std::max(std::max(strange[i] - Pstrange[i], strange[i] - Mstrange[i]), 0.0),2);
-
-			Pdeltac[i] += std::pow(std::max(std::max(Pcharm[i] - charm[i], Mcharm[i] - charm[i]), 0.0),2);
-			Mdeltac[i] += std::pow(std::max(std::max(charm[i] - Pcharm[i], charm[i] - Mcharm[i]), 0.0),2);
-
-			Pdeltab[i] += std::pow(std::max(std::max(Pbottom[i] - bottom[i], Mbottom[i] - bottom[i]), 0.0),2);
-			Mdeltab[i] += std::pow(std::max(std::max(bottom[i] - Pbottom[i], bottom[i] - Mbottom[i]), 0.0),2);
+				Pdeltag[i] += std::pow(Pgluon[i] - gluon[i],2);
+				Mdeltag[i] += std::pow(Mgluon[i] - gluon[i],2);
 
 
-			Pdeltaau[i] += std::pow(std::max(std::max(Paup[i] - aup[i], Maup[i] - aup[i]), 0.0),2);
-			Mdeltaau[i] += std::pow(std::max(std::max(aup[i] - Paup[i], aup[i] - Maup[i]), 0.0),2);
+				Pdeltau[i] += std::pow(Pup[i] - up[i],2);
+				Mdeltau[i] += std::pow(Mup[i] - up[i],2);
 
-			Pdeltaad[i] += std::pow(std::max(std::max(Padown[i] - adown[i], Madown[i] - adown[i]), 0.0),2);
-			Mdeltaad[i] += std::pow(std::max(std::max(adown[i] - Padown[i], adown[i] - Madown[i]), 0.0),2);
+				Pdeltad[i] += std::pow(Pdown[i] - down[i],2);
+				Mdeltad[i] += std::pow(Mdown[i] - down[i],2);
 
-			Pdeltaas[i] += std::pow(std::max(std::max(Pastrange[i] - astrange[i], Mastrange[i] - astrange[i]), 0.0),2);
-			Mdeltaas[i] += std::pow(std::max(std::max(astrange[i] - Pastrange[i], astrange[i] - Mastrange[i]), 0.0),2);
+				Pdeltas[i] += std::pow(Pstrange[i] - strange[i],2);
+				Mdeltas[i] += std::pow(Mstrange[i] - strange[i],2);
 
-			Pdeltaac[i] += std::pow(std::max(std::max(Pacharm[i] - acharm[i], Macharm[i] - acharm[i]), 0.0),2);
-			Mdeltaac[i] += std::pow(std::max(std::max(acharm[i] - Pacharm[i], acharm[i] - Macharm[i]), 0.0),2);
+				Pdeltac[i] += std::pow(Pcharm[i] - charm[i],2);
+				Mdeltac[i] += std::pow(Mcharm[i] - charm[i],2);
 
-			Pdeltaab[i] += std::pow(std::max(std::max(Pabottom[i] - abottom[i], Mabottom[i] - abottom[i]), 0.0),2);
-			Mdeltaab[i] += std::pow(std::max(std::max(abottom[i] - Pabottom[i], abottom[i] - Mabottom[i]), 0.0),2);
+				Pdeltab[i] += std::pow(Pbottom[i] - bottom[i],2);
+				Mdeltab[i] += std::pow(Mbottom[i] - bottom[i],2);
+
+
+				Pdeltaau[i] += std::pow(Paup[i] - aup[i],2);
+				Mdeltaau[i] += std::pow(Maup[i] - aup[i],2);
+
+				Pdeltaad[i] += std::pow(Padown[i] - adown[i],2);
+				Mdeltaad[i] += std::pow(Madown[i] - adown[i],2);
+
+				Pdeltaas[i] += std::pow(Pastrange[i] - astrange[i],2);
+				Mdeltaas[i] += std::pow(Mastrange[i] - astrange[i],2);
+
+				Pdeltaac[i] += std::pow(Pacharm[i] - acharm[i],2);
+				Mdeltaac[i] += std::pow(Macharm[i] - acharm[i],2);
+
+				Pdeltaab[i] += std::pow(Pabottom[i] - abottom[i],2);
+				Mdeltaab[i] += std::pow(Mabottom[i] - abottom[i],2);
+			}
+
+			else
+			{
+
+				Pdeltag[i] += std::pow(std::max(std::max(Pgluon[i] - gluon[i], Mgluon[i] - gluon[i]), 0.0),2);
+				Mdeltag[i] += std::pow(std::max(std::max(gluon[i] - Pgluon[i], gluon[i] - Mgluon[i]), 0.0),2);
+
+
+				Pdeltau[i] += std::pow(std::max(std::max(Pup[i] - up[i], Mup[i] - up[i]), 0.0),2);
+				Mdeltau[i] += std::pow(std::max(std::max(up[i] - Pup[i], up[i] - Mup[i]), 0.0),2);
+
+				Pdeltad[i] += std::pow(std::max(std::max(Pdown[i] - down[i], Mdown[i] - down[i]), 0.0),2);
+				Mdeltad[i] += std::pow(std::max(std::max(down[i] - Pdown[i], down[i] - Mdown[i]), 0.0),2);
+
+				Pdeltas[i] += std::pow(std::max(std::max(Pstrange[i] - strange[i], Mstrange[i] - strange[i]), 0.0),2);
+				Mdeltas[i] += std::pow(std::max(std::max(strange[i] - Pstrange[i], strange[i] - Mstrange[i]), 0.0),2);
+
+				Pdeltac[i] += std::pow(std::max(std::max(Pcharm[i] - charm[i], Mcharm[i] - charm[i]), 0.0),2);
+				Mdeltac[i] += std::pow(std::max(std::max(charm[i] - Pcharm[i], charm[i] - Mcharm[i]), 0.0),2);
+
+				Pdeltab[i] += std::pow(std::max(std::max(Pbottom[i] - bottom[i], Mbottom[i] - bottom[i]), 0.0),2);
+				Mdeltab[i] += std::pow(std::max(std::max(bottom[i] - Pbottom[i], bottom[i] - Mbottom[i]), 0.0),2);
+
+
+				Pdeltaau[i] += std::pow(std::max(std::max(Paup[i] - aup[i], Maup[i] - aup[i]), 0.0),2);
+				Mdeltaau[i] += std::pow(std::max(std::max(aup[i] - Paup[i], aup[i] - Maup[i]), 0.0),2);
+
+				Pdeltaad[i] += std::pow(std::max(std::max(Padown[i] - adown[i], Madown[i] - adown[i]), 0.0),2);
+				Mdeltaad[i] += std::pow(std::max(std::max(adown[i] - Padown[i], adown[i] - Madown[i]), 0.0),2);
+
+				Pdeltaas[i] += std::pow(std::max(std::max(Pastrange[i] - astrange[i], Mastrange[i] - astrange[i]), 0.0),2);
+				Mdeltaas[i] += std::pow(std::max(std::max(astrange[i] - Pastrange[i], astrange[i] - Mastrange[i]), 0.0),2);
+
+				Pdeltaac[i] += std::pow(std::max(std::max(Pacharm[i] - acharm[i], Macharm[i] - acharm[i]), 0.0),2);
+				Mdeltaac[i] += std::pow(std::max(std::max(acharm[i] - Pacharm[i], acharm[i] - Macharm[i]), 0.0),2);
+
+				Pdeltaab[i] += std::pow(std::max(std::max(Pabottom[i] - abottom[i], Mabottom[i] - abottom[i]), 0.0),2);
+				Mdeltaab[i] += std::pow(std::max(std::max(abottom[i] - Pabottom[i], abottom[i] - Mabottom[i]), 0.0),2);
+			}
+
 
 		}
 
-		Pdeltag[i] = std::sqrt(Pdeltag[i]);
-		Mdeltag[i] = std::sqrt(Mdeltag[i]);
 
-		Pdeltau[i] = std::sqrt(Pdeltau[i]);
-		Mdeltau[i] = std::sqrt(Mdeltau[i]);
+		double N_rep= 1.0;
 		
-		std::cout << "Pdeltag[" << i << "] = " << Pdeltag[i] << std::endl;
-		std::cout << "Mdeltag[" << i << "] = " << Mdeltag[i] << std::endl;
+		if (pdfSet=="NNPDF40_nnlo_as_01180"){N_rep = pdfs.size()-2.;}
+		else{N_rep = 1.0;}
+		
+		std::cout << N_rep << std::endl;
 
-		Pdeltad[i] = std::sqrt(Pdeltad[i]);
-		Mdeltad[i] = std::sqrt(Mdeltad[i]);
+		Pdeltag[i] = std::sqrt(Pdeltag[i]/N_rep)/Zfactor;
+		Mdeltag[i] = std::sqrt(Mdeltag[i]/N_rep)/Zfactor;
 
-		Pdeltas[i] = std::sqrt(Pdeltas[i]);
-		Mdeltas[i] = std::sqrt(Mdeltas[i]);
+		Pdeltau[i] = std::sqrt(Pdeltau[i]/N_rep)/Zfactor;
+		Mdeltau[i] = std::sqrt(Mdeltau[i])/N_rep/Zfactor;
+		
+		//std::cout << "Pdeltag[" << i << "] = " << Pdeltag[i] << std::endl;
+		//std::cout << "Mdeltag[" << i << "] = " << Mdeltag[i] << std::endl;
 
-		Pdeltac[i] = std::sqrt(Pdeltac[i]);
-		Mdeltac[i] = std::sqrt(Mdeltac[i]);
+		Pdeltad[i] = std::sqrt(Pdeltad[i]/N_rep)/Zfactor;
+		Mdeltad[i] = std::sqrt(Mdeltad[i])/N_rep/Zfactor;
 
-		Pdeltab[i] = std::sqrt(Pdeltab[i]);
-		Mdeltab[i] = std::sqrt(Mdeltab[i]);
+		Pdeltas[i] = std::sqrt(Pdeltas[i]/N_rep)/Zfactor;
+		Mdeltas[i] = std::sqrt(Mdeltas[i]/N_rep)/Zfactor;
 
-		Pdeltaau[i] = std::sqrt(Pdeltaau[i]);
-		Mdeltaau[i] = std::sqrt(Mdeltaau[i]);
+		Pdeltac[i] = std::sqrt(Pdeltac[i]/N_rep)/Zfactor;
+		Mdeltac[i] = std::sqrt(Mdeltac[i]/N_rep)/Zfactor;
 
-		Pdeltaad[i] = std::sqrt(Pdeltaad[i]);
-		Mdeltaad[i] = std::sqrt(Mdeltaad[i]);
+		Pdeltab[i] = std::sqrt(Pdeltab[i]/N_rep)/Zfactor;
+		Mdeltab[i] = std::sqrt(Mdeltab[i]/N_rep)/Zfactor;
 
-		Pdeltaas[i] = std::sqrt(Pdeltaas[i]);
-		Mdeltaas[i] = std::sqrt(Mdeltaas[i]);
+		Pdeltaau[i] = std::sqrt(Pdeltaau[i]/N_rep)/Zfactor;
+		Mdeltaau[i] = std::sqrt(Mdeltaau[i]/N_rep)/Zfactor;
 
-		Pdeltaac[i] = std::sqrt(Pdeltaac[i]);
-		Mdeltaac[i] = std::sqrt(Mdeltaac[i]);
+		Pdeltaad[i] = std::sqrt(Pdeltaad[i]/N_rep)/Zfactor;
+		Mdeltaad[i] = std::sqrt(Mdeltaad[i]/N_rep)/Zfactor;
 
-		Pdeltaab[i] = std::sqrt(Pdeltaab[i]);
-		Mdeltaab[i] = std::sqrt(Mdeltaab[i]);
+		Pdeltaas[i] = std::sqrt(Pdeltaas[i]/N_rep)/Zfactor;
+		Mdeltaas[i] = std::sqrt(Mdeltaas[i]/N_rep)/Zfactor;
+
+		Pdeltaac[i] = std::sqrt(Pdeltaac[i]/N_rep)/Zfactor;
+		Mdeltaac[i] = std::sqrt(Mdeltaac[i]/N_rep)/Zfactor;
+
+		Pdeltaab[i] = std::sqrt(Pdeltaab[i]/N_rep)/Zfactor;
+		Mdeltaab[i] = std::sqrt(Mdeltaab[i]/N_rep)/Zfactor;
 
 	}
 
@@ -379,7 +440,8 @@ int main() {
 
     gPStrange->GetXaxis()->SetTitle("x");
     gPStrange->GetYaxis()->SetTitle("xf(x, Q^{2})");
-    gPStrange->SetTitle((pdfSet+" at Q = M_{W} ").c_str());
+    gPStrange->SetTitle((Title+" at Q^{2} = M^{2}_{W} ").c_str());
+    //gPStrange->SetTitle((Title+" at Q^{2} = 10^{2} GeV^{2}").c_str());
     TLegend* legend = new TLegend(0.9, 0.55, 0.7, 0.9);
 
     legend->AddEntry(gluonshade, "g/5", "f");
@@ -503,6 +565,9 @@ int main() {
 	*/
     // Save the plot
     c1->SaveAs((pdfSet + "PDFs.pdf").c_str());
+	TFile* outFile = new TFile((pdfSet+"_Q=M.root").c_str(),"RECREATE");
+	c1->Write();
+	outFile->Close();
 
     return 0;
 }

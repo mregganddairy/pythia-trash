@@ -18,7 +18,7 @@ Init:showChangedParticleData = off
 
 ! Input file.
 Beams:frameType = 4
-Beams:LHEF =wm_pwgevents.lhe 
+Beams:LHEF =/home/Josh/physics/POWHEG-BOX-V2/Z/testrun-lhc-8TeV/pwgevents.lhe
 
 ! Number of outgoing particles of POWHEG Born level process
 ! (i.e. not counting additional POWHEG radiation)

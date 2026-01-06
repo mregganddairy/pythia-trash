@@ -8,5 +8,12 @@ root assignment7macro2.cc to get the rapidity plots for all showered files.
 root assignment7macro3.cc to compare different pdfs...
 root assignment7macro4.cc to produce differential cross section for y incorporating pdfs' corresponding uncertainty. Also produces uncertainty percentage plots and the ratios of the electroweak bosons. 
 
+root assignment8macro(1-3).cc uhm I forgor
+root assignment8macro4.cc plots the rapidity differential cross section for all bosons and also provides the ratios of different pdfs and their uncertainties.
+root assignment8macro5.cc plots the invariant mass differential cross section for JUST Z BOSON and also provides the ratios of different pdfs and their uncertainties.
+root assignment8macro6.cc plots the transverse momentum of the diffferential cross section and also provides the ratios of theratios of different podfs and their uncertainties.
+the _1.cc files are made specifically for determining the ratios (Apm, Rpm and RZ/W) ratios for their corresponding distributions.
+
+
 plotPDFs.cc... plots PDFs for hessian type PDFs.
 plotPDFs_NNN.cc is the successful version plotPDFs_NN.cc and plots the pdfs for neural network type pdfs.
